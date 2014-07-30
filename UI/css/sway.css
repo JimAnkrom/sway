@@ -1,0 +1,15 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #a2a2a2;
+    color: #222;
+}
+
+@media (min-width: 800px) {
+    body {
+        background-size: 100%;
+        background-position: top left;
+    }
+}
