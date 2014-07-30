@@ -1,4 +1,9 @@
 
+# Non-Functional Requirements
+    ### Front-end must depend on an extremely minimal set of libraries.
+
+
+
 # Front end (Browser app)
 ## Collect input sensor data
     ### Gyroscope
