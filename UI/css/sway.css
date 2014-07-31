@@ -1,15 +1,75 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
 * {
-    box-sizing: border-box;
-}
+  box-sizing: border-box; }
 
 body {
-    background-color: #a2a2a2;
-    color: #222;
-}
+  background-color: #222;
+  color: #eeeeee;
+  font-family: "Open Sans", sans-serif; }
+
+h1, h2, h3 {
+  color: #a2a2a2; }
+
+p {
+  font-size: .8em;
+  padding: 5px; }
+
+div {
+  width: 100%;
+  margin: 0 auto; }
+
+a {
+  text-decoration: none;
+  color: #4c578f; }
+
+a:visited {
+  color: #60518f; }
+
+a:active {
+  color: #AFB5D5; }
+
+table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  width: 50%;
+  border: 1px solid #333; }
+
+th {
+  text-align: left;
+  padding: 2px 5px;
+  color: #000;
+  font-size: .9em;
+  font-weight: bold; }
+
+td {
+  padding: 2px 5px;
+  font-size: .8em; }
+
+tr:nth-child(odd) {
+  background-color: #666; }
+
+tr:nth-child(even) {
+  background-color: #333; }
+
+table caption {
+  color: #a2a2a2;
+  font-weight: bold;
+  padding: 2px;
+  border: 1px solid #333;
+  border-bottom: 1px solid #222; }
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-top: 20px;
+  margin-left: -150px;
+  width: 300px;
+  color: #a2a2a2;
+  text-align: center;
+  font-size: .7em; }
 
 @media (min-width: 800px) {
-    body {
-        background-size: 100%;
-        background-position: top left;
-    }
-}
+  body {
+    background-size: 100%;
+    background-position: top left; } }
