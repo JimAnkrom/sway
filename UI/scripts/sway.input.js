@@ -4,7 +4,8 @@
  * References:
  * http://www.w3.org/TR/orientation-event/
  * https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained
- *
+ * http://diveintohtml5.info/geolocation.html
+
  * X, Y, Z - East, North, Up (off the device)
  *
  * Device lying flat horizontal pointing west:
@@ -14,8 +15,17 @@
 
  * touchstart, touchmove events
  */
+
 var sway = {
     debugPanel: null,
+    templates: {
+        dataRow: function (label, value) {
+            return '<tr><td>' + label + '</td><td>' + value + '</td></tr>';
+        }
+    },
+    deviceInfo: {
+        userAgent: navigator.userAgent
+    },
     input: {
         // TODO: Orientation
         // TODO: Motion
@@ -43,7 +53,7 @@ var sway = {
 //                this.calibration = e;
 //            }
             if (sway.debugPanel) {
-                this.renderDebugEvent(sway.debugPanel, e);
+                sway.renderDebugEvent(sway.debugPanel, e);
             }
             sway.input.calibration.orientation = e;
         },
@@ -51,35 +61,60 @@ var sway = {
         handleMotionEvent: function (e) {
             this.calibration.motion = e.acceleration || e.accellerationIncludingGravity || {};
             this.calibration.rotation = e.rotationRate || {};
+            this.calibration.motionInterval = e.interval || {};
 
             if (sway.debugPanel) {
-                this.renderDebugEvent.call(this, sway.debugPanel, e);
+                sway.renderDebugEvent.call(this, sway.debugPanel, e);
             }
         },
         handleTouchEvent: function () {
         },
         outputToDebug: function () {
+        }
+    },
+    location: {
+        get: function () {
+            navigator.geolocation.getCurrentPosition(this.handleGeolocation);
         },
-        renderDebugEvent: function (panel, e) {
-            var o = this.calibration.orientation;
-            var m = this.calibration.motion;
-            var r = this.calibration.rotation;
-            panel.innerHTML = "absolute: " + o.absolute;
-            panel.innerHTML += "<br>alpha: " + o.alpha;
-            panel.innerHTML += "<br>beta: " + o.beta;
-            panel.innerHTML += "<br>gamma: " + o.gamma;
-            panel.innerHTML += "<br>accel X: " + m.x;
-            panel.innerHTML += "<br>accel Y: " + m.y;
-            panel.innerHTML += "<br>accel Z: " + m.z;
-            panel.innerHTML += "<br>rotation alpha: " + r.alpha;
-            panel.innerHTML += "<br>rotation beta: " + r.beta;
-            panel.innerHTML += "<br>rotation gamma: " + r.gamma;
+        handleGeolocation: function (pos) {
+            sway.location.current = pos;
         }
     }
 };
 
+sway.renderDebugEvent = function (panel, e) {
+    var c = this.calibration;
+    var o = c.orientation,
+        m = c.motion,
+        r = c.rotation,
+        i = c.motionInterval,
+        l = sway.location.current,
+        t = sway.templates;
+
+    sway.debugPanel.innerHTML = "<table>"
+        + t.dataRow('absolute', o.absolute)
+        + t.dataRow('alpha', o.alpha)
+        + t.dataRow('beta', o.beta)
+        + t.dataRow('gamma', o.gamma)
+        + t.dataRow('accel.X', m.x)
+        + t.dataRow('accel.Y', m.y)
+        + t.dataRow('accel.Z', m.z)
+        + t.dataRow('rot alpha', r.alpha)
+        + t.dataRow('rot beta', r.beta)
+        + t.dataRow('rot gamma', r.gamma)
+        + t.dataRow('interval', i)
+        + t.dataRow('latitude', l.latitude)
+        + t.dataRow('longitude', l.longitude)
+        + t.dataRow('altitude', l.altitude),
+        + "</table>";
+};
+
 window.addEventListener('load', function () {
     alert("Sway v0.13!");
+    if (navigator.geolocation)
+    {
+        sway.location.get.call(this);
+    }
     var element = document.getElementById('debugPanel');
     if (element) {
         sway.debugPanel = element;
