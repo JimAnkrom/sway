@@ -1,0 +1,32 @@
+[
+    { "id": 23, "userAgent": "Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; T-Mobile myTouch 3G Slide Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+       "position": {
+           "latitude": 0,
+           "longitude": 0,
+           "accuracy": 1
+       }},
+    { "id": 34, "userAgent": "Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile",
+        "position": {
+            "latitude": 0,
+            "longitude": 0,
+            "accuracy": 1
+        }},
+    { "id": 9, "userAgent": "Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile",
+        "position": {
+            "latitude": 0,
+            "longitude": 0,
+            "accuracy": 1
+        }},
+    { "id": 22, "userAgent": "Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile",
+        "position": {
+            "latitude": 0,
+            "longitude": 0,
+            "accuracy": 1
+        }},
+    { "id": 1, "userAgent": "Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile",
+        "position": {
+            "latitude": 0,
+            "longitude": 0,
+            "accuracy": 1
+        }}
+]
