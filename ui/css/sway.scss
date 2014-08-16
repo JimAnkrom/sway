@@ -1,0 +1,123 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
+
+$body-background: #222;
+$text-color-body: #eeeeee;
+$text-color-head: #a2a2a2;
+$link-color: #4c578f;
+$link-color-visited: #60518f;
+$color-gray-dk: #333;
+$color-gray-lt: #666;
+
+$font-main: "Open Sans", sans-serif;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: $body-background;
+  color: $text-color-body;
+  font-family: $font-main;
+}
+
+h1, h2, h3 {
+  color: $text-color-head;
+}
+
+p {
+  font-size: .8em;
+  padding: 5px;
+}
+
+div {
+  width: 100%;
+  margin: 0 auto;
+}
+
+a {
+  text-decoration: none;
+  &:link {
+    color: $link-color;
+  }
+  &:visited {
+    color: $link-color-visited;
+  }
+  &:hover, &:active {
+    color: #2f3564;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  width: 50%;
+  border: 1px solid $color-gray-dk;
+}
+
+th {
+  text-align: left;
+  padding: 2px 5px;
+  color: #000;
+  font-size: .9em;
+  font-weight: bold;
+}
+
+td {
+  padding: 2px 5px;
+  font-size: .8em;
+}
+
+tr:nth-child(odd) {
+  background-color: $color-gray-lt;
+}
+
+tr:nth-child(even) {
+  background-color: $color-gray-dk;
+}
+
+table caption {
+  color: $text-color-head;
+  font-weight: bold;
+  padding: 2px;
+  border: 1px solid $color-gray-dk;
+  border-bottom: 1px solid #222;
+}
+
+select {
+  background-color: transparent;
+  color: $text-color-head;
+  border: 1px solid $color-gray-dk;
+  padding: 5px;
+  margin: 5px;
+  font-weight: bold;
+  font-family: $font-main;
+  &:focus {
+    outline-color: transparent;
+  }
+}
+
+option {
+  background-color: $color-gray-lt;
+  color: #000;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: $text-color-head;
+  text-align: center;
+  font-size: .7em;
+}
+
+@media (min-width: 800px) {
+  body {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  a {
+    transition: color 3s;
+  }
+}

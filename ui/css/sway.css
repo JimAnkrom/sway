@@ -3,7 +3,7 @@
   box-sizing: border-box; }
 
 body {
-  background-color: #222;
+  background-color: #222222;
   color: #eeeeee;
   font-family: "Open Sans", sans-serif; }
 
@@ -24,16 +24,14 @@ a {
     color: #4c578f; }
   a:visited {
     color: #60518f; }
-  a:hover {
+  a:hover, a:active {
     color: #2f3564; }
-  a:active {
-    color: #afb5d5; }
 
 table {
   border-collapse: collapse;
   margin: 0 auto;
   width: 50%;
-  border: 1px solid #333; }
+  border: 1px solid #333333; }
 
 th {
   text-align: left;
@@ -47,22 +45,22 @@ td {
   font-size: .8em; }
 
 tr:nth-child(odd) {
-  background-color: #666; }
+  background-color: #666666; }
 
 tr:nth-child(even) {
-  background-color: #333; }
+  background-color: #333333; }
 
 table caption {
   color: #a2a2a2;
   font-weight: bold;
   padding: 2px;
-  border: 1px solid #333;
+  border: 1px solid #333333;
   border-bottom: 1px solid #222; }
 
 select {
   background-color: transparent;
   color: #a2a2a2;
-  border: 1px solid #333;
+  border: 1px solid #333333;
   padding: 5px;
   margin: 5px;
   font-weight: bold;
@@ -71,7 +69,7 @@ select {
     outline-color: transparent; }
 
 option {
-  background-color: #666;
+  background-color: #666666;
   color: #000; }
 
 footer {

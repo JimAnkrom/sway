@@ -3,8 +3,9 @@
     
     
 # Non-Functional Requirements
-    ### Front-end must depend on an extremely minimal set of libraries.
-
+    ### User front-end must depend on an extremely minimal set of libraries.
+        - administration front end may use any libraries deemed fit
+    ### OSC control mapping must be user-configurable (by admin).
 
 
 # Front end (Browser app)
@@ -25,7 +26,7 @@
 ## Submit sensor data to server
 
 
-# Server (node.js RESTful API)
+# Server (node.js RESTful API) (PROPOSED/OUT OF DATE/TBD - see sway.api.js for current implementation)
     ### Administration Services
         - [POST] Authenticate - get an admin token
             parameters { u: <username>, p: <password> } (cleartext OK for now)
