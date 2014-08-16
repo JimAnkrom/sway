@@ -9,14 +9,14 @@ module.exports = function(config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine'],
+        frameworks: ['jasmine', 'requirejs'],
 
         // list of files / patterns to load in the browser
         // included: false means you want to load them manually (eg, using require)
         files: [
             'test/test.main.js',
             {pattern: 'test/lib/**/*.js', included: false},
-            {pattern: 'test/scripts/*.js', included: false},
+            {pattern: 'test/scripts/ui/*.js', included: false},
             {pattern: 'ui/scripts/**/*.js', included: false}
         ],
 
@@ -60,7 +60,7 @@ module.exports = function(config) {
 
         // plugins
         plugins: [
-            'karma-jasmine','karma-sinon','karma-phantomjs-launcher'
+            'karma-jasmine','karma-requirejs','karma-sinon','karma-phantomjs-launcher'
         ],
 
         // Continuous Integration mode

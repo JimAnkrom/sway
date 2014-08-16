@@ -23,11 +23,15 @@ exports.tests = {
         test.ok(users.findAll);
         test.done();
     },
-    testUsersFindAll_Exposed: function (test) {
+    testUsersFindAll_IsExposed: function (test) {
         test.ok(users.findAll, JSON.stringify(users));
         test.done();
     },
-    testUsersAddUser_Exposed: function (test) {
+    testUsersFindById_IsExposed: function (test) {
+        test.ok(users.findById, JSON.stringify(users));
+        test.done();
+    },
+    testUsersAddUser_IsExposed: function (test) {
         test.ok(users.addUser);
         test.done();
     },
@@ -38,14 +42,31 @@ exports.tests = {
         test.done();
     },
     testUsersAddUsers_ReturnsDifferentToken: function (test) {
+        // arrange
         users.clear();
+        // act
         var token1 = users.addUser(referenceUser);
         var token2 = users.addUser(referenceUser2);
+        var userList = users.findAll();
+        // assert
         test.ok(token1);
         test.ok(token1.id);
         test.notEqual(token1.id, token2.id, "Token IDs were the same!");
-        var userList = users.findAll();
         test.equals(userList.length, 2, "UserList was " + userList.length);
+        test.done();
+    },
+    testUsersFindById_ReturnsCorrectUser: function (test) {
+        users.clear();
+        var token1 = users.addUser(referenceUser);
+        var token2 = users.addUser(referenceUser2);
+        var token3 = users.addUser(referenceUser);
+        // act
+        var user = users.findById(token2.id);
+        // assert
+        test.ok(token2);
+        test.ok(token2.id);
+        test.ok(user);
+        test.equals(user.id, token2.id, "User was " + JSON.stringify(user));
         test.done();
     }
 };
