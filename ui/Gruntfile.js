@@ -1,5 +1,5 @@
 /*
- * concatenates, minifies, and cleans up all html/css/js
+ * optimize all client-size files for sway user control app
  *
  */
 
@@ -14,30 +14,24 @@ module.exports = function(grunt) {
                 options: {
                     separator: ";"
                 },
-                src: ["scripts/*.js"],
+                src: ["scripts/sway.input.js", "scripts/sway.user.js"],
                 dest: "<%= pkg.name %>.concat.js"
-            },
-            css: {
-                src: ["css/*.css"],
-                dest: "<%= pkg.name %>.concat.css"
             }
+//            css: {
+//                src: ["css/*.css"],
+//                dest: "<%= pkg.name %>.concat.css"
+//            }
         },
         uglify: {
-            options: {
-                banner: "/*! <%= pkg.name %> - processed <%= grunt.template.today('yyyy-mm-dd') %> */\n"
-            },
             build: {
                 src: "<%= pkg.name %>.concat.js",
-                dest: "dist/scripts/<%= pkg.name %>.min.js"
+                dest: "../dist/scripts/<%= pkg.name %>.user.min.js"
             }
         },
         cssmin: {
-            options: {
-                banner: "/*! <%= pkg.name %> - processed <%= grunt.template.today('yyyy-mm-dd') %> */\n"
-            },
             build: {
-                src: "<%= pkg.name %>.concat.css",
-                dest: "dist/css/<%= pkg.name %>.min.css"
+                src: "css/<%= pkg.name %>.user.css",
+                dest: "../dist/css/<%= pkg.name %>.user.min.css"
             }
         },
         htmlmin: {
@@ -47,7 +41,7 @@ module.exports = function(grunt) {
                     collapseWhitespace: true
                 },
                 files: {
-                    "dist/admin.min.html": "admin.html"
+                    "../dist/user.min.html": "user.html"
                 }
             }
         },
@@ -61,4 +55,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-clean");
 
     grunt.registerTask("default", ["concat", "uglify", "cssmin", "htmlmin", "clean"]);
+
 };
