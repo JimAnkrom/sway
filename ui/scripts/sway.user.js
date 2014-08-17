@@ -11,43 +11,63 @@ var sway = sway || {test: true};
     sway.user = {
         token: {},
         user: {},
-        initialized: null,
+        oninitialized: null,
         init: function () {
-            if (sway.controlUrl) {
-                this.user.agent = navigator.userAgent;
-                this.authorize();
-            }
-            return sway.user.debug('sway.controlUrl is not set!');
+            if (!(sway.serverUrl)) return sway.user.debug('sway.controlUrl is not set!');
+            this.user.agent = navigator.userAgent;
+            this.authorize();
         },
-        authorize: function () {
+        authorize: function (callback) {
             // post to url/users
-            this.get(sway.controlUrl, this.user, {
+            this.post(sway.serverUrl + "/users", this.user, {
                     success: function (req, res) {
-                        sway.user = res.user;
-                        sway.token = res.token;
-                        if (sway.initialized) sway.initialized.call(sway, res);
+                        sway.user.user = res.user;
+                        sway.user.token = res.token;
+                        if (callback)
+                        { callback.call(sway, res); }
+                        if (sway.user.oninitialized)  {
+                            sway.user.oninitialized.call(sway, res);
+                        }
                     }
                 }
             );
         },
         get: function (url, params, options) {
-            return request(url, 'GET', params, options);
+            return this.request(url, 'GET', params, options);
+        },
+        post: function (url, params, options) {
+            return this.request(url, 'POST', params, options);
         },
         request: function (url, verb, params, options) {
+            var ooptions = options || {};
             if (window.XMLHttpRequest) {
                 var http = new XMLHttpRequest();
-                http.responseType = options.responseType || "json";
+                options.responseType = options.responseType || "json";
+                if (http.responseType) {
+                    http.responseType = options.responseType;
+                }
                 http.onreadystatechange = function () {
                     if (http.readyState==4) {
                         if (http.status== 200) {
-                            if (options.success) { options.success(http, http.response); }
+                            if (options.success) {
+                                if (!http.responseType)
+                                {
+                                    if (options.responseType == 'json')
+                                    {
+                                        http.response = JSON.parse(http.responseText);
+                                    } else {
+                                        http.response = http.responseText;
+                                    }
+                                }
+                                options.success(http, http.response);
+                            }
                         }
                         else {
                             if (options.error)
                             {
                                 options.error(http, http.response);
                             }
-                            sway.debug('Error: Response status ' + http.status + ' returned for ' + http.url);
+                            sway.user.debug('Error: Response status ' + http.status + ' returned for ' + http.url);
                         }
                     }
                 };
@@ -66,4 +86,5 @@ var sway = sway || {test: true};
             }
         }
     };
+    return sway.user;
 }());
