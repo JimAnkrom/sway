@@ -10,7 +10,7 @@ module.exports = function(grunt) {
         watch: {
             ui: {
                 files: ['../ui/scripts/*.js','./scripts/ui/*.js'],
-                tasks: ['jasmine:ui'],
+                tasks: ['karma'],
                 options: {
                     event: ['all']
                 }
@@ -23,12 +23,9 @@ module.exports = function(grunt) {
                 }
             }
         },
-        jasmine: {
-            ui: {
-                src: '../ui/scripts/sway*.js',
-                options: {
-                    specs: './scripts/ui/*.js'
-                }
+        karma: {
+            unit: {
+                configFile: 'karma.config.js'
             }
         },
         nodeunit: {
@@ -43,8 +40,7 @@ module.exports = function(grunt) {
     });
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
-    grunt.loadNpmTasks('grunt-contrib-jasmine');
-    //grunt.loadNpmTasks('grunt-contrib-jasmine-requirejs');
-    grunt.registerTask('test_sway_ui', ['jasmine:ui']);
+    grunt.loadNpmTasks('grunt-karma');
+    grunt.registerTask('test_sway_ui', ['karma']);
     grunt.registerTask('test_sway_api', ['nodeunit']);
 };

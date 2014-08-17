@@ -1,19 +1,21 @@
 {
     "name": "sway-test",
     "version": "0.1.0",
-
     "devDependencies": {
         "grunt": "~0.4.5",
+        "grunt-bower": "0.13.4",
         "grunt-contrib-watch": "~0.6.1",
         "grunt-contrib-jshint": "~0.10.0",
         "grunt-contrib-nodeunit": "~0.4.1",
+        "nodeunit": "~0.9.0",
+        "phantomjs": "~1.9.7",
+        "karma": "~0.12.21",
+        "grunt-karma": "~0.8.3",
         "grunt-contrib-jasmine": "~0.7.0",
         "requirejs": "~2.1.14",
-        "karma": "~0.12.21",
-        "phantomjs": "~1.9.7",
-        "nodeunit": "~0.9.0",
         "karma-requirejs": "~0.2.2",
         "karma-jasmine": "~0.1.5",
+        "karma-sinon": "~1.0.3",
         "karma-phantomjs-launcher": "~0.1.4"
     }
 }

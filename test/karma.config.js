@@ -15,7 +15,7 @@ module.exports = function(config) {
         // included: false means you want to load them manually (eg, using require)
         files: [
             'test/test.main.js',
-            {pattern: 'test/lib/**/*.js', included: false},
+            {pattern: 'test/bower_components/**/*.js', included: false},
             {pattern: 'test/scripts/ui/*.js', included: false},
             {pattern: 'ui/scripts/**/*.js', included: false}
         ],

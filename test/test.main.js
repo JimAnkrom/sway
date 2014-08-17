@@ -1,5 +1,5 @@
 /**
- * Created by cosinezero on 8/13/2014.
+ * Created by Jim Ankrom on 8/13/2014.
  */
 var allTestFiles = [];
 var TEST_REGEXP = /(spec|test)\.js$/i;
@@ -21,11 +21,8 @@ require.config({
 
     // Paths for require modules
     'paths': {
-        // system under test
-        // app
-
         // Libraries
-        'sinon': 'test/lib/sinon-1.10.2'
+        'sinon': 'test/bower_components/sinonjs/sinon'
     },
 
     'shim': {
