@@ -3,11 +3,26 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Sway Admin Panel</title>
-    <link rel="stylesheet" href="css/sway.css" />
+    <link rel="stylesheet" href="css/sway.admin.css" />
 </head>
 <body>
 
+<h1>Sway admin panel</h1>
 
-<script type="text/javascript" src="scripts/sway.input.js"></script>
+<div id="currentUsers">
+    <table>
+        <caption>Users currently connected</caption>
+        <tr><th>ID</th><th>UserAgent</th></tr>
+        <tr><td>23</td><td>Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; T-Mobile myTouch 3G Slide Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1</td></tr>
+        <tr><td>34</td><td>Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile</td></tr>
+        <tr><td>9</td><td>Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile</td></tr>
+        <tr><td>22</td><td>Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile</td></tr>
+    </table>
+</div>
+
+<p><a href="http://github.com/JimAnkrom/sway">Fork us on GitHub</a></p>
+
+<script type="text/javascript" src="scripts/sway.admin.js"></script>
+<!-- <script type="text/javascript" src="scripts/sway.input.js"></script> -->
 </body>
 </html>

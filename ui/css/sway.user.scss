@@ -1,0 +1,11 @@
+@import "sway.main.scss";
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: $text-color-head;
+  text-align: center;
+  font-size: .7em;
+}

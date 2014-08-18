@@ -22,12 +22,16 @@ require.config({
     // Paths for require modules
     'paths': {
         // Libraries
-        'sinon': 'test/bower_components/sinonjs/sinon'
+        'sinon': 'test/bower_components/sinonjs/sinon',
+        'text': 'test/bower_components/text/text'
     },
 
     'shim': {
         'sinon': {
             'exports': 'sinon'
+        },
+        'text': {
+            'exports': 'text'
         }
     },
 

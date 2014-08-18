@@ -3,7 +3,7 @@
 $body-background: #222;
 $text-color-body: #eeeeee;
 $text-color-head: #a2a2a2;
-$link-color: #4c578f;
+$link-color: #606BAA;
 $link-color-visited: #60518f;
 $color-gray-dk: #333;
 $color-gray-lt: #666;
@@ -29,13 +29,9 @@ p {
   padding: 5px;
 }
 
-div {
-  width: 100%;
-  margin: 0 auto;
-}
-
 a {
   text-decoration: none;
+  border-bottom: 1px dotted $body-background;
   &:link {
     color: $link-color;
   }
@@ -43,9 +39,15 @@ a {
     color: $link-color-visited;
   }
   &:hover, &:active {
-    color: #2f3564;
+    border-bottom: 1px dotted $color-gray-lt;
   }
 }
+
+div {
+  width: 100%;
+  margin: 0 auto;
+}
+
 
 table {
   border-collapse: collapse;
@@ -80,7 +82,7 @@ table caption {
   font-weight: bold;
   padding: 2px;
   border: 1px solid $color-gray-dk;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid $body-background;
 }
 
 select {
@@ -101,16 +103,6 @@ option {
   color: #000;
 }
 
-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  color: $text-color-head;
-  text-align: center;
-  font-size: .7em;
-}
-
 @media (min-width: 800px) {
   body {
     width: 80%;
@@ -118,6 +110,6 @@ footer {
   }
 
   a {
-    transition: color 3s;
+    transition: border 500ms ease-in;
   }
 }

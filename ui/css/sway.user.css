@@ -14,18 +14,19 @@ p {
   font-size: .8em;
   padding: 5px; }
 
-div {
-  width: 100%;
-  margin: 0 auto; }
-
 a {
-  text-decoration: none; }
+  text-decoration: none;
+  border-bottom: 1px dotted #222222; }
   a:link {
-    color: #4c578f; }
+    color: #606baa; }
   a:visited {
     color: #60518f; }
   a:hover, a:active {
-    color: #2f3564; }
+    border-bottom: 1px dotted #666666; }
+
+div {
+  width: 100%;
+  margin: 0 auto; }
 
 table {
   border-collapse: collapse;
@@ -55,7 +56,7 @@ table caption {
   font-weight: bold;
   padding: 2px;
   border: 1px solid #333333;
-  border-bottom: 1px solid #222; }
+  border-bottom: 1px solid #222222; }
 
 select {
   background-color: transparent;
@@ -72,6 +73,13 @@ option {
   background-color: #666666;
   color: #000; }
 
+@media (min-width: 800px) {
+  body {
+    width: 80%;
+    margin: 0 auto; }
+
+  a {
+    transition: border 500ms ease-in; } }
 footer {
   position: absolute;
   bottom: 0;
@@ -80,11 +88,3 @@ footer {
   color: #a2a2a2;
   text-align: center;
   font-size: .7em; }
-
-@media (min-width: 800px) {
-  body {
-    width: 80%;
-    margin: 0 auto; }
-
-  a {
-    transition: color 3s; } }
