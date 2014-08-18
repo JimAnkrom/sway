@@ -28,31 +28,49 @@ define(['sinon', 'text!test/data/users.test.json'], function (sinon, usersJson) 
 //            });
             });
             it('parses the json data and assigns to var usersData', function () {
+                var mockServer = sinon.fakeServer.create();
+                mockServer.respondWith('http://sway:81334/users', [200, {"Content-Type": "application/json"}, usersJson]);
+
                 var users = {
                     init: function () {
-                        // go get json from server
-                        // and then:
-                        this.loadUsers(usersJson)
+                        var httpRequest = new XMLHttpRequest();
+                        httpRequest.open('get', 'http://sway:81334/users', true);
+                        httpRequest.send();
+                        mockServer.respond();
+
+                        if (XMLHttpRequest.DONE && httpRequest.status === 200) {
+                            this.loadUsers(httpRequest.responseText);
+                        }
                     },
-                    loadUsers: function () {
-                        this.usersData = JSON.parse(usersJson)
+                    loadUsers: function (responseText) {
+                        this.usersData = JSON.parse(responseText)
                     }
                 };
                 users.init();
                 expect(users.usersData.length).toBe(5);
+                console.log(users.usersData[4].id);
+
             });
         });
 
-        describe('the objects of users.userData represent connected users on the server', function () {
+        describe('the objects in users.userData represent connected users on the server', function () {
             it('each will contain a user id and userAgent', function () {
+                var mockServer = sinon.fakeServer.create();
+                mockServer.respondWith('http://sway:81334/users', [200, {"Content-Type": "application/json"}, usersJson]);
+
                 var users = {
                     init: function () {
-                        // go get json from server
-                        // and then:
-                        this.loadUsers(usersJson)
+                        var httpRequest = new XMLHttpRequest();
+                        httpRequest.open('get', 'http://sway:81334/users', true);
+                        httpRequest.send();
+                        mockServer.respond();
+
+                        if (XMLHttpRequest.DONE && httpRequest.status === 200) {
+                            this.loadUsers(httpRequest.responseText);
+                        }
                     },
-                    loadUsers: function () {
-                        this.usersData = JSON.parse(usersJson)
+                    loadUsers: function (responseText) {
+                        this.usersData = JSON.parse(responseText)
                     }
                 };
                 users.init();
