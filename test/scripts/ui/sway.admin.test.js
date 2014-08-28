@@ -19,20 +19,26 @@ define(['sinon', 'text!test/data/users.test.json'], function (sinon, usersJson) 
                 expect(users).toBeDefined();
             });
             it('requests the sample user data from the server', function () {
-//                var users = {
-//                    init: function () {
-//                        // go get json from server
-//                          this.usersJson = {{server response}}
-//                    }
-//                };
-//            });
+                var mockServer = sinon.fakeServer.create();
+                mockServer.respondWith('http://sway:81334/users', [200, {"Content-Type": "application/json"}, usersJson]);
+
+                var users = {
+                    getCurrent: function () {
+                        var httpRequest = new XMLHttpRequest();
+                        httpRequest.open('get', 'http://sway:81334/users', true);
+                        httpRequest.send();
+                        mockServer.respond();
+                    }
+                };
+                expect(users.getCurrent()).toBe();
+
             });
             it('parses the json data and assigns to var usersData', function () {
                 var mockServer = sinon.fakeServer.create();
                 mockServer.respondWith('http://sway:81334/users', [200, {"Content-Type": "application/json"}, usersJson]);
 
                 var users = {
-                    init: function () {
+                    getCurrent: function () {
                         var httpRequest = new XMLHttpRequest();
                         httpRequest.open('get', 'http://sway:81334/users', true);
                         httpRequest.send();
@@ -43,12 +49,11 @@ define(['sinon', 'text!test/data/users.test.json'], function (sinon, usersJson) 
                         }
                     },
                     loadUsers: function (responseText) {
-                        this.usersData = JSON.parse(responseText)
+                        this.currentUsers = JSON.parse(responseText)
                     }
                 };
-                users.init();
-                expect(users.usersData.length).toBe(5);
-                console.log(users.usersData[4].id);
+                users.getCurrent();
+                expect(users.currentUsers.length).toBe(5);
 
             });
         });
@@ -59,7 +64,7 @@ define(['sinon', 'text!test/data/users.test.json'], function (sinon, usersJson) 
                 mockServer.respondWith('http://sway:81334/users', [200, {"Content-Type": "application/json"}, usersJson]);
 
                 var users = {
-                    init: function () {
+                    getCurrent: function () {
                         var httpRequest = new XMLHttpRequest();
                         httpRequest.open('get', 'http://sway:81334/users', true);
                         httpRequest.send();
@@ -70,21 +75,50 @@ define(['sinon', 'text!test/data/users.test.json'], function (sinon, usersJson) 
                         }
                     },
                     loadUsers: function (responseText) {
-                        this.usersData = JSON.parse(responseText)
+                        this.currentUsers = JSON.parse(responseText)
                     }
                 };
-                users.init();
+                users.getCurrent();
 
-                expect(users.usersData[0].id).toBeDefined;
-                expect(users.usersData[0].userAgent).toBeDefined;
+                expect(users.currentUsers[0].id).toBeDefined;
+                expect(users.currentUsers[0].userAgent).toBeDefined;
             });
 
         });
 
-        xdescribe('the view object', function () {
-            xit('iterates over the user list object to find each of the children', function () {
-            });
-            xit('displays each child on the page as a row in currentUsers', function () {
+        describe('the admin object', function () {
+            var mockServer = sinon.fakeServer.create();
+            mockServer.respondWith('http://sway:81334/users', [200, {"Content-Type": "application/json"}, usersJson]);
+
+            var users = { //talks to server for info about the users of a session
+                getCurrent: function () {
+                    var httpRequest = new XMLHttpRequest();
+                    httpRequest.open('get', 'http://sway:81334/users', true);
+                    httpRequest.send();
+                    mockServer.respond();
+
+                    if (XMLHttpRequest.DONE && httpRequest.status === 200) {
+                        this.loadUsers(httpRequest.responseText);
+                    }
+                },
+                loadUsers: function (responseText) {
+                    this.currentUsers = JSON.parse(responseText)
+                }
+            };
+
+            var admin = { //handles user data for presentation on the admin interface
+                displayCurrent: function () {
+                    users.getCurrent(); //get list of currently connected users and process for display
+                    users.currentUsers.forEach(this.formatUser);
+                },
+                formatUser: function (user) {
+                    //create table row for each user
+                    console.log('<tr id="' + user.id + '"><td>' + user.id + '</td>' + '<td>' + user.userAgent + '</td></tr>');
+                }
+            };
+            admin.displayCurrent();
+            it('displays each child on the page as a row in currentUsers', function () {
+
             });
         });
     });
