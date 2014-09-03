@@ -43,7 +43,24 @@ var sway = {
         // TODO: DeviceMotionEvent.interval
         // TODO: DeviceMotionEvent.rotationRate
         motion: null,
+        handleOSCClick: function (address, value) {
+            if (sway.user) {
+                if (sway.user.token) {
+                    //alert('orientation event ' + JSON.stringify(sway.user.token) );
 
+                    var params = {
+                        token: sway.user.token,
+                        control: {
+                            address: address,
+                            value: value
+                    }};
+                    // Setting a 50ms gate for now... faster later? Who knows. ;)
+                    sway.poll = window.setTimeout(
+                        sway.user.post.bind(sway.user, sway.serverUrl + '/osc', params, {}),
+                        50);
+                }
+            }
+        },
         // DeviceOrientationEvent handler
         handleOrientationEvent: function (e) {
 //            if (!calibration) {

@@ -185,6 +185,15 @@ module.exports = (function () {
             }
             res.end();
         },
+        sendOsc: function (req, res) {
+            var body = req.body;
+            if (body.control) {
+                auth.request(req, res, isAuthControl, sway.control.send.bind(sway.control, body.control.address, body.control.value), function () {
+                    auth.authorizationFailure(req, res, req.body.token);
+                });
+            }
+            res.end();
+        },
         calibrate: function () {
             auth.request(req, res, isAuthCalibrate, sway.control.calibrate, function () {
                 auth.authorizationFailure(req, res, req.body.token);
