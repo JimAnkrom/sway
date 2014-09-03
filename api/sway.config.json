@@ -1,0 +1,30 @@
+{
+    "server": {
+        "address": "127.0.0.1",
+        "port": "3333"
+    },
+    "orientation": {
+        "absolute": "",
+        "alpha": "/orientation/alpha",
+        "beta": "/orientation/beta",
+        "gamma": "/orientation/gamma"
+    },
+    "motion": {
+        "x": "",
+        "y": "",
+        "z": ""
+    },
+    "rotation": {
+        "alpha": "/rotation/alpha",
+        "beta": "/rotation/beta",
+        "gamma": "/rotation/gamma"
+    },
+    "location": {
+        "latitude": "",
+        "longitude": "",
+        "altitude": ""
+    },
+    "osc": {
+        "addresses": ["/composition/video/effect1/opacity/values","/composition/video/effect2/opacity/values"]
+    }
+}

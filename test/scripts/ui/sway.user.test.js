@@ -82,5 +82,33 @@ define(['sinon', 'sway', 'sway.user'], function (sinon, sway, user) {
             });
         });
 
+        describe('.request', function () {
+            var server;
+            beforeEach(function () {
+                server = sinon.fakeServer.create();
+                var serverUrl = "http://www.sway.com";
+                sway.serverUrl = serverUrl;
+
+                var authResponse = {
+                    user: {
+                        id: 10,
+                        agent: "Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; T-Mobile myTouch 3G Slide Build/GRI40) AppleWebKit/533.1"
+                    },
+                    token: { id: 10, uid: 219024871 }
+                };
+                server.respondWith('POST', serverUrl + "/test",
+                    [200, {"Content-Type": "application/json"},
+                        JSON.stringify(authResponse)] );
+
+            });
+            it('returns a response', function () {
+                var http = user.request(sway.serverUrl + "/test", "POST", {blah: 'blah'}, {
+                });
+
+                expect(http).toBeDefined();
+                expect(http.status).toBe(200);
+            });
+
+        })
     });
 });

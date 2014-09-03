@@ -5,8 +5,8 @@
  *
  * It requires the existence of global a config variable 'sway', which must have a value 'controlUrl'
  */
-var sway = sway || {test: true};
-
+//var sway = sway || {test: true};
+sway.serverUrl = 'http://192.168.1.8:1333';
 (function () {
     sway.user = {
         token: {},
@@ -14,20 +14,25 @@ var sway = sway || {test: true};
         oninitialized: null,
         init: function () {
             if (!(sway.serverUrl)) return sway.user.debug('sway.controlUrl is not set!');
-            this.user.agent = navigator.userAgent;
+            sway.user.user.agent = navigator.userAgent;
             this.authorize();
         },
         authorize: function (callback) {
             // post to url/users
-            this.post(sway.serverUrl + "/users", this.user, {
+            this.post(sway.serverUrl + "/users", sway.user.user, {
                     success: function (req, res) {
+
                         sway.user.user = res.user;
                         sway.user.token = res.token;
+                        alert('Authorized! - ' + res);// JSON.stringify(res));
                         if (callback)
                         { callback.call(sway, res); }
                         if (sway.user.oninitialized)  {
                             sway.user.oninitialized.call(sway, res);
                         }
+                    },
+                    error: function (err, res) {
+                        alert('error ' + JSON.stringify(err));
                     }
                 }
             );
@@ -43,12 +48,12 @@ var sway = sway || {test: true};
             if (window.XMLHttpRequest) {
                 var http = new XMLHttpRequest();
                 options.responseType = options.responseType || "json";
-                if (http.responseType) {
+                if (http.responseType != null) {
                     http.responseType = options.responseType;
                 }
                 http.onreadystatechange = function () {
                     if (http.readyState==4) {
-                        if (http.status== 200) {
+                        if (http.status==200) {
                             if (options.success) {
                                 if (!http.responseType)
                                 {
@@ -63,6 +68,7 @@ var sway = sway || {test: true};
                             }
                         }
                         else {
+                            alert('Error: Response status ' + http.status + ' returned for ' + http.url);
                             if (options.error)
                             {
                                 options.error(http, http.response);
@@ -71,8 +77,11 @@ var sway = sway || {test: true};
                         }
                     }
                 };
+                var message = JSON.stringify(params);
                 http.open(verb, url, true);
-                http.send();
+                //http.setRequestHeader('Content-type', 'application/json"');
+                //http.setRequestHeader("Content-Length", message.length);
+                http.send(message);
                 return http;
             }
             // because IE5&6 needs to go away

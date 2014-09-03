@@ -3,7 +3,7 @@
  *
  * Sway User Service
  * - Maintains list of users current on system
- *
+ * - Is the authority on uid generation.
  */
 var _ = require('underscore');
 var userList = [];
@@ -16,28 +16,29 @@ module.exports = (function () {
             return userList;
         },
         findById: function (id) {
-            for (var i=0; i < userList.length; i++)
-            {
-                var user = userList[i];
-                if (user.id==id) {
-                    return user;
-                }
-            }
+            return _.find(userList, function(u){
+                return u.id == id;
+            });
+        },
+        findByUid: function (uid) {
+            return _.find(userList, function(u){
+                return u.uid == uid;
+            });
         },
         // Add a user to the system. Should return the user.
-        addUser: function (options) {
-            var id = Date.now();
+        createUser: function (options) {
+            var uid = options.uid || Date.now();
             // If this ever is on a multi-threaded system this could cause duplicate ids without a locking scheme.
             // Not super likely considering the use case, but these things keep me up at night.
-            if (idList.indexOf(id) == -1) {
-                idList.push(id);
-                options.uid = id;
-                userList.push(options);
-                options.id = idList.length;
+            if (idList.indexOf(uid) == -1) {
+                idList.push(uid);
+                options.uid = uid;
+                var id = userList.push(options);
+                options.id = id;
                 return options;
             } else {
                 // Try again to get a new datetime stamp, since we were lucky in our request and one already exists
-                return this.addUser.call(this, options);
+                return this.createUser.call(this, options);
             }
         },
         clear: function () {

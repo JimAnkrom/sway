@@ -35,8 +35,7 @@ var controlMessage = {
     },
     // motion interval
     "i": 0
-}
-
+};
 exports.tests = {
     test_Control: function (test) {
 
@@ -45,8 +44,14 @@ exports.tests = {
 
         test.done();
     },
-    test_Control_Submission_IsReturnedInDebug: function (test) {
+    control_send_reachesOSC: function (test) {
+        swayControl.send('/testAddress', 200);
 
+        test.ok(swayControl != null);
+
+        test.done();
+    },
+    test_Control_Submission_IsReturnedInDebug: function (test) {
         swayControl.control(controlMessage);
         var debugControl = swayControl.debug();
 
@@ -67,4 +72,8 @@ exports.tests = {
         test.ok(debugControl.control[0].l.lat);
         test.done();
     }
+};
+exports.tearDown = function (done) {
+    //
+    done();
 };

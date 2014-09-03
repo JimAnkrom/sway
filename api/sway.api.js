@@ -7,22 +7,37 @@
 
 var fs = require('fs');
 var express = require('express');
-var users = require('./sway.users');
-var control = require('./sway.control');
+var bodyParser = require('body-parser');
+var swayServer = require('./sway.server');
 
-var port = 81334;
+var port = 1333;
 var userPage = 'user.html';
+
+var swayUserCookie = "swayuser";
 
 var app = express();
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ type: '*/json' }));
+app.use(bodyParser.json({ type: 'text/plain' }));
+
+app.all('*', function(req, res, next) {
+    res.set('Content-Type', 'application/json');
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+});
+
 // Application Server
 
+
+
 // list users
-app.get('/users', users.findAll);
+app.get('/users', swayServer.findAll);
 // get user
-app.get('/users/:id', users.findById);
+//app.get('/users/:id', users.findById);
 // create user
-app.post('/users', users.addUser);
+app.post('/users', swayServer.createUser);
 
 // update user
 // app.put('/users/:id', users.updateUser);
@@ -30,9 +45,9 @@ app.post('/users', users.addUser);
 //app.delete('/users/:id', users.deleteUser);
 
 // submit control message
-app.post('/control', control.control);
+app.post('/control', swayServer.control);
 // get debug information
-app.get('/debug', control.debug);
+//app.get('/debug', control.debug);
 
 app.listen(port);
 console.log('Server started, listening on port ' + port + '...');

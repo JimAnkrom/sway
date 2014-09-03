@@ -15,7 +15,6 @@
 
  * touchstart, touchmove events
  */
-
 var sway = {
     debugPanel: null,
     templates: {
@@ -53,9 +52,23 @@ var sway = {
 //                this.calibration = e;
 //            }
             if (sway.debugPanel) {
+
                 sway.renderDebugEvent(sway.debugPanel, e);
             }
             sway.input.calibration.orientation = e;
+            if (sway.user) {
+                if (sway.user.token) {
+                    //alert('orientation event ' + JSON.stringify(sway.user.token) );
+
+                    var params = {token: sway.user.token, control: { orientation: {
+                        alpha: e.alpha, beta: e.beta, gamma: e.gamma, absolute: e.absolute
+                    }}};
+                    // Setting a 50ms gate for now... faster later? Who knows. ;)
+                    sway.poll = window.setTimeout(
+                        sway.user.post.bind(sway.user, sway.serverUrl + '/control', params, {}),
+                        50);
+                }
+            }
         },
         // DeviceMotionEvent handler
         handleMotionEvent: function (e) {
@@ -84,37 +97,50 @@ var sway = {
 
 sway.renderDebugEvent = function (panel, e) {
     var c = this.calibration;
+    if (!c) return;
     var o = c.orientation,
         m = c.motion,
         r = c.rotation,
         i = c.motionInterval,
-        l = sway.location.current,
+    //l = sway.location.current,
         t = sway.templates;
 
-    sway.debugPanel.innerHTML = "<table>"
-        + t.dataRow('absolute', o.absolute)
-        + t.dataRow('alpha', o.alpha)
-        + t.dataRow('beta', o.beta)
-        + t.dataRow('gamma', o.gamma)
-        + t.dataRow('accel.X', m.x)
-        + t.dataRow('accel.Y', m.y)
-        + t.dataRow('accel.Z', m.z)
-        + t.dataRow('rot alpha', r.alpha)
-        + t.dataRow('rot beta', r.beta)
-        + t.dataRow('rot gamma', r.gamma)
-        + t.dataRow('interval', i)
-        + t.dataRow('latitude', l.latitude)
-        + t.dataRow('longitude', l.longitude)
-        + t.dataRow('altitude', l.altitude),
-        + "</table>";
+    var output = "<table>";
+    if (o) {
+        output +=
+            t.dataRow('absolute', o.absolute)
+            + t.dataRow('alpha', o.alpha)
+            + t.dataRow('beta', o.beta)
+            + t.dataRow('gamma', o.gamma);
+    }
+    if (m) {
+        output +=
+            t.dataRow('accel.X', m.x)
+            + t.dataRow('accel.Y', m.y)
+            + t.dataRow('accel.Z', m.z);
+
+    }
+    if (r) {
+
+        output +=
+            t.dataRow('rot alpha', r.alpha)
+            + t.dataRow('rot beta', r.beta)
+            + t.dataRow('rot gamma', r.gamma);
+    }
+        //+ t.dataRow('interval', i)
+        //+ t.dataRow('latitude', l.latitude)
+        //+ t.dataRow('longitude', l.longitude)
+        //+ t.dataRow('altitude', l.altitude),
+        output += "</table>";
+    sway.debugPanel.innerHTML = output;
 };
 
 window.addEventListener('load', function () {
-    alert("Sway v0.13!");
-    if (navigator.geolocation)
-    {
-        sway.location.get.call(this);
-    }
+    alert("Sway v0.20.1!");
+//    if (navigator.geolocation)
+//    {
+//        sway.location.get.call(this);
+//    }
     var element = document.getElementById('debugPanel');
     if (element) {
         sway.debugPanel = element;
@@ -132,6 +158,7 @@ window.addEventListener('load', function () {
             sway.input.handleMotionEvent.call(sway.input, e);
         });
     }
+    //alert(JSON.stringify(sway.input.capabilities));
 });
 
 
