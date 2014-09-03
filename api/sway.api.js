@@ -44,6 +44,8 @@ app.post('/users', swayServer.createUser);
 // ban user - blocks all info from their device
 //app.delete('/users/:id', users.deleteUser);
 
+// submit osc message
+app.post('/osc', swayServer.sendOsc);
 // submit control message
 app.post('/control', swayServer.control);
 // get debug information
