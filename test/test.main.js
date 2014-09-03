@@ -21,12 +21,21 @@ require.config({
 
     // Paths for require modules
     'paths': {
+        // App Under Test
+        'sway': 'ui/scripts/sway.input',
+        'sway.user': 'ui/scripts/sway.user',
         // Libraries
         'sinon': 'test/bower_components/sinonjs/sinon',
         'text': 'test/bower_components/text/text'
     },
 
     'shim': {
+        'sway': {
+            'exports': 'sway'
+        },
+        'sway.user': {
+            'exports': 'sway.user'
+        },
         'sinon': {
             'exports': 'sinon'
         },
