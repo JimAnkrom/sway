@@ -46,18 +46,14 @@ var sway = {
         handleOSCClick: function (address, value) {
             if (sway.user) {
                 if (sway.user.token) {
-                    //alert('orientation event ' + JSON.stringify(sway.user.token) );
-
                     var params = {
                         token: sway.user.token,
                         control: {
                             address: address,
                             value: value
                     }};
-                    // Setting a 50ms gate for now... faster later? Who knows. ;)
-                    sway.poll = window.setTimeout(
-                        sway.user.post.bind(sway.user, sway.serverUrl + '/osc', params, {}),
-                        50);
+                    //directly post the click event
+                    sway.user.post(sway.serverUrl + '/osc', params, {});
                 }
             }
         },

@@ -188,10 +188,14 @@ module.exports = (function () {
         sendOsc: function (req, res) {
             var body = req.body;
             if (body.control) {
+
                 auth.request(req, res, isAuthControl, sway.control.send.bind(sway.control, body.control.address, body.control.value), function () {
                     auth.authorizationFailure(req, res, req.body.token);
                 });
+            } else {
+                console.log('body.control was null');
             }
+
             res.end();
         },
         calibrate: function () {
