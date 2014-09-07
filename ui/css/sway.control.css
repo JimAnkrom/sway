@@ -44,7 +44,7 @@ a {
   border: 1px solid #333333;
   border-radius: 3px;
   color: #a2a2a2;
-  transition: all 2300ms cubic-bezier(0.075, 0.82, 0.165, 1);
+  transition: all 1s cubic-bezier(0.075, 0.82, 0.165, 1);
   text-align: center;
   overflow: hidden;
   font-weight: bold;
