@@ -45,7 +45,23 @@ module.exports = function(grunt) {
                 }
             }
         },
-        clean: ["<%= pkg.name %>.concat.js", "<%= pkg.name %>.concat.css"]
+        clean: ["<%= pkg.name %>.concat.js", "<%= pkg.name %>.concat.css"],
+
+        "bower-install-simple": {
+            options: {
+                color: true
+            },
+            "prod": {
+                options: {
+                    production: true
+                }
+            },
+            "dev": {
+                options: {
+                    production: false
+                }
+            }
+        }
     });
 
     grunt.loadNpmTasks("grunt-contrib-concat");
@@ -53,7 +69,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-cssmin");
     grunt.loadNpmTasks("grunt-contrib-htmlmin");
     grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-bower-install-simple");
 
-    grunt.registerTask("default", ["concat", "uglify", "cssmin", "htmlmin", "clean"]);
+    grunt.registerTask("default", ["bower-install-simple", "concat", "uglify", "cssmin", "htmlmin", "clean"]);
 
 };

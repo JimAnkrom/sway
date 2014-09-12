@@ -1,0 +1,28 @@
+dist
+
+# Javascript/Node stack ignores
+
+bower_components
+node_modules
+.lock-wscript
+
+# OSX ignores
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows ignores
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
