@@ -1,21 +1,9 @@
 {
     "multitest1": {
-        "rotation": {
-            "alpha": "/rotation/alpha",
-            "beta": "/rotation/beta",
-            "gamma": "/rotation/gamma"
-        },
-        "orientation": {
-            "alpha": "/test1/alpha",
-            "beta": "/test1/beta",
-            "gamma": "/test1/gamma"
-        }
+        "rotation": "/rotation",
+        "orientation": "/orientation"
     },
     "orient1": {
-        "orientation": {
-            "alpha": "/orientation/alpha",
-            "beta": "/orientation/beta",
-            "gamma": "/orientation/gamma"
-        }
+        "orientation": "/orientation"
     }
 }
