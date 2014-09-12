@@ -34,6 +34,9 @@ function StubRequest(body, cookie) {
     this.body = body;
     this.cookies = function (name) {
         return JSON.stringify(cookie);
+    }, 
+    this.headers = {
+        "user-agent": "Test User Agent"
     }
 };
 
