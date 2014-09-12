@@ -1,0 +1,42 @@
+{
+    "master": {
+        "control": {
+            "button1": "",
+            "button2": "",
+            "button3": "",
+            "button4": ""
+        },
+        "rotation": {
+            "alpha": "/rotation/alpha",
+            "beta": "/rotation/beta",
+            "gamma": "/rotation/gamma"
+        },
+        "orientation": {
+            "alpha": "/orientation/alpha",
+            "beta": "/orientation/beta",
+            "gamma": "/orientation/gamma"
+        }
+    },
+    "rotat1": {
+        "rotation": {
+            "alpha": "/rotation/alpha",
+            "beta": "/rotation/beta",
+            "gamma": "/rotation/gamma"
+        }
+    },
+    "orient1": {
+        "orientation": {
+            "alpha": "/orientation/alpha",
+            "beta": "/orientation/beta",
+            "gamma": "/orientation/gamma"
+        }
+    },
+    "layer1": {
+        "control": {
+            "button1": "",
+            "button2": "",
+            "button3": "",
+            "button4": ""
+        }
+    }
+}

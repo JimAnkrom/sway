@@ -1,7 +1,20 @@
 {
+    "local": {
+        "port": 1333
+    },
+    "api": {
+        "control": "/control",
+        "mappedOSC": "/maposc",
+        "OSC": "/osc",
+        "users": "/users"
+    },
     "server": {
         "address": "127.0.0.1",
         "port": "3333"
+    },
+    "channel": {
+        "balancer": "roundrobin",
+        "defaultQueueSize": -1
     },
     "orientation": {
         "absolute": "",

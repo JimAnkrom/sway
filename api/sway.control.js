@@ -18,25 +18,23 @@ module.exports = (function (){
     sway.server = {
         calibration: function (data) {
             sway.state.settings.calibration = data;
-            console.log('Calibration Received - ' + JSON.stringify(data));
+            //console.log('Calibration Received - ' + JSON.stringify(data));
         },
-        control: function (control) {
+        control: function (channel, control) {
             sway.state.control.push(control);
-            // map control to OSC messages
-            var cfg = sway.config;
-            if (control.rotation) {
-                var r = control.rotation;
-                var cr = cfg.rotation;
-                if (r.alpha!=null) sway.server.send(cr.alpha, r.alpha);
-                if (r.beta!=null) sway.server.send(cr.beta, r.beta);
-                if (r.gamma!=null) sway.server.send(cr.gamma, r.gamma);
-            }
-            if (control.orientation) {
-                var o = control.orientation;
-                var co = cfg.orientation;
-                if (o.alpha!=null) sway.server.send(co.alpha, o.alpha);
-                if (o.beta!=null) sway.server.send(co.beta, o.beta);
-                if (o.gamma!=null) sway.server.send(co.gamma, o.gamma);
+            // we only care about the channel configuration, so use that
+            this.processMotion(channel, control, 'rotation');
+            this.processMotion(channel, control, 'orientation');
+        },
+        processMotion: function (channel, control, inputType) {
+            var cRoute = channel[inputType]
+            if (cRoute) {
+                var cInput = control[inputType];
+                if (cInput) {
+                    if (cRoute.alpha != null) sway.server.send(cRoute.alpha, cInput.alpha);
+                    if (cRoute.beta != null) sway.server.send(cRoute.beta, cInput.beta);
+                    if (cRoute.gamma != null) sway.server.send(cRoute.gamma, cInput.gamma);
+                }
             }
         },
         clear: function () {
@@ -47,7 +45,7 @@ module.exports = (function (){
             return sway.state;
         },
         send: function (address, value) {
-            console.log(address + ' ' + value);
+            // console.log(address + ' ' + value);
             if (address) sway.osc.send(address, value);
             return null;
         },

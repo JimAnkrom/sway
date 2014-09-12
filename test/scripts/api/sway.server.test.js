@@ -19,6 +19,7 @@ function referenceUser2() {
 };
 
 var swayServer = require('../../../api/sway.server.js');
+var swayAuth = require('../../../api/sway.auth.js');
 
 // Move to an express mocks library
 function StubResponse() {
@@ -27,6 +28,7 @@ function StubResponse() {
     this.json = function (obj) {
         this.response = obj;
     };
+    this.end = function () {};
 };
 function StubRequest(body, cookie) {
     this.body = body;
@@ -47,15 +49,28 @@ exports.tests = {
         var res = new StubResponse();
 
         // act
-        swayServer.createUser(req, res);
+        swayAuth.createUser(req, res, function () {});
 
         // assert
-        test.ok(res.response.token.uid != null);
-        test.ok(res.response.user.uid != null);
-        test.ok(res.response.user.auth.uid != null);
+        test.ok(req.token.uid != null);
+        test.ok(req.user.uid != null);
         test.done();
     },
-    Server_createUsers_ReturnsControlAuthForFirstUser: function (test) {
+    Server_createUser_ReturnsAssignedUser: function (test) {
+        // arrange
+        var req = new StubRequest({ name: "Jim" }, {});
+        var res = new StubResponse();
+
+        // act
+        swayAuth.createUser(req, res, function () {});
+
+        // assert
+        test.ok(req.user.channel != null);
+        test.ok(req.user.channel.name != null);
+        console.log(req.user.channel.name);
+        test.done();
+    },
+    Server_createUsers_ReturnsChannelForFirstUser: function (test) {
         // arrange
         var req1 = new StubRequest(referenceUser(), {});
         var res1 = new StubResponse();
@@ -64,12 +79,15 @@ exports.tests = {
 
         // act
         swayServer.reset();
-        swayServer.createUser(req1, res1);
-        swayServer.createUser(req2, res2);
-        var auth1 = res1.response.user.auth;
+        swayAuth.createUser(req1, res1, function () {});
+        swayAuth.createUser(req2, res2, function () {});
+        var channel = req1.user.channel;
 
         // assert
-        test.equal(auth1.value, 'control', 'First user did not receive control auth!');
+        console.log('User 1 Channel: ' + channel.name);
+        console.log('User 2 Channel: ' + req2.user.channel.name);
+        test.ok(channel.name != null, 'First user did not receive channel!');
+        test.ok(req2.user.channel != null, 'Second user did not receive channel!');
         test.done();
     },
     Server_createUsers_ReturnsNoAuthForSecondUser: function (test) {
@@ -81,14 +99,14 @@ exports.tests = {
 
         // act
         swayServer.reset();
-        swayServer.createUser(req1, res1);
-        swayServer.createUser(req2, res2);
-        var auth1 = res1.response.user.auth;
-        var auth2 = res2.response.user.auth;
+        swayAuth.createUser(req1, res1, function () {});
+        swayAuth.createUser(req2, res2, function () {});
+        var channel = req1.user.channel;
 
         // assert
-        test.equal(auth1.value, 'control', 'First user did not receive control auth!');
-        test.equal(auth2.value, 'queued');
+        test.ok(channel != null, 'First user did not receive channel!');
+        test.ok(req2.user.channel != null, 'Second user did not receive channel!');
+        test.ok(channel.name != req2.user.channel.name, 'Users were assigned same channel!');
         test.done();
     },
     Server_createUsers_ReturnsDifferentToken: function (test) {
@@ -100,13 +118,11 @@ exports.tests = {
 
         // act
         swayServer.reset();
-        swayServer.createUser(req1, res1);
-        swayServer.createUser(req2, res2);
-        var result1 = res1.response;
-        var result2 = res2.response;
+        swayAuth.createUser(req1, res1, function () {});
+        swayAuth.createUser(req2, res2, function () {});
 
         // assert
-        test.notEqual(result1.token.uid, result2.token.uid, "Token uids were the same! " + result1.token.uid + ' and ' + result2.token.uid + '.');
+        test.notEqual(req1.token.uid, req2.token.uid, "Token uids were the same! " + req1.token.uid + ' and ' + req2.token.uid + '.');
         test.done();
     },
     Server_createUser_ReturnsToken: function (test) {
@@ -115,8 +131,8 @@ exports.tests = {
         swayServer.reset();
 
         // act
-        swayServer.createUser(req1, res1);
-        test.ok(res1.response.token != null);
+        swayAuth.createUser(req1, res1, function () {});
+        test.ok(req1.token != null);
 
         // assert
         test.done();
@@ -125,7 +141,7 @@ exports.tests = {
         var req1 = new StubRequest(referenceUser(), {});
         var res1 = new StubResponse();
         swayServer.reset();
-        swayServer.createUser(req1, res1);
+        swayAuth.createUser(req1, res1, function () {});
 
         // act
         var req2 = new StubRequest({

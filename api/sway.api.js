@@ -9,12 +9,11 @@ var fs = require('fs');
 var express = require('express');
 var bodyParser = require('body-parser');
 var swayServer = require('./sway.server');
+var swayAuth = require('./sway.auth');
+var config = require('./sway.config.json');
 
-var port = 1333;
+var port = config.local.port;
 var userPage = 'user.html';
-
-var swayUserCookie = "swayuser";
-
 var app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,28 +27,59 @@ app.all('*', function(req, res, next) {
     next();
 });
 
-// Application Server
+// Sway Middleware
+
+function createUser (res, req, next) {
+    swayAuth.createUser.call(swayAuth, res, req, next);
+}
+function authenticate (res, req, next) {
+    swayAuth.authenticate.call(swayAuth, res, req, next);
+}
 
 
+// Create user router - must bypass auth routines
+var createRouter = express.Router();
+createRouter.post('/users', createUser);
+createRouter.use(swayServer.finalizeUserResponse);
+app.post('/users', createRouter);
 
+// authenticate all other requests
+app.use(authenticate);
+
+// Router for all user calls
+var userRouter = express.Router();
+// Authorize these resquests as a user
+userRouter.use(swayAuth.authUser);
+// submit control message
+userRouter.post(config.api.control, swayServer.control);
+// submit mapped osc message
+userRouter.post(config.api.mappedOSC, swayServer.sendMapOsc);
+// submit osc message
+userRouter.post(config.api.OSC, swayServer.sendOsc);
+// finalize user request
+userRouter.use(swayServer.finalizeUserResponse);
+
+// Wire the user router to api calls
+app.post(config.api.control, userRouter);
+app.post(config.api.mappedOSC, userRouter);
+app.post(config.api.OSC, userRouter);
+
+
+// Wire the admin router to api calls
+var adminRouter = express.Router();
+adminRouter.use(swayAuth.authAdmin);
 // list users
-app.get('/users', swayServer.findAll);
+adminRouter.get(config.api.users, swayServer.findAll);
 // get user
-//app.get('/users/:id', users.findById);
-// create user
-app.post('/users', swayServer.createUser);
-
+//adminRouter.get('/users/:id', users.findById);
 // update user
 // app.put('/users/:id', users.updateUser);
 // ban user - blocks all info from their device
 //app.delete('/users/:id', users.deleteUser);
-
-// submit osc message
-app.post('/osc', swayServer.sendOsc);
-// submit control message
-app.post('/control', swayServer.control);
 // get debug information
 //app.get('/debug', control.debug);
+
+
 
 app.listen(port);
 console.log('Server started, listening on port ' + port + '...');

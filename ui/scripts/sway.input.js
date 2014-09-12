@@ -43,6 +43,21 @@ var sway = {
         // TODO: DeviceMotionEvent.interval
         // TODO: DeviceMotionEvent.rotationRate
         motion: null,
+        handleMapOSC: function (address, value) {
+            if (sway.user) {
+                if (sway.user.token) {
+                    var params = {
+                        token: sway.user.token,
+                        map: {
+                            channel: sway.user.token.channel || 'default',
+                            address: address,
+                            value: value
+                        }};
+                    //directly post the click event
+                    sway.user.post(sway.serverUrl + '/maposc', params, {});
+                }
+            }
+        },
         handleOSCClick: function (address, value) {
             if (sway.user) {
                 if (sway.user.token) {
@@ -73,14 +88,17 @@ var sway = {
                 if (sway.user.token) {
                     //alert('orientation event ' + JSON.stringify(sway.user.token) );
 
-                    var params = {token: sway.user.token, control: { orientation: {
+                    sway.input.current = {token: sway.user.token, control: { orientation: {
                         alpha: e.alpha, beta: e.beta, gamma: e.gamma, absolute: e.absolute
                     }}};
                     // Setting a 50ms gate for now... faster later? Who knows. ;)
-                    sway.poll = window.setTimeout(
-                        sway.user.post.bind(sway.user, sway.serverUrl + '/control', params, {}),
-                        50);
+                    if (!sway.poll) {
+                        sway.poll = window.setInterval(function () {
+                            sway.user.post(sway.serverUrl + '/control', sway.input.current, {})}, 50);
+                    }
                 }
+            } else {
+                alert('sway.user not set');
             }
         },
         // DeviceMotionEvent handler
@@ -119,6 +137,7 @@ sway.renderDebugEvent = function (panel, e) {
         t = sway.templates;
 
     var output = "<table>";
+    output += t.dataRow('Channel', JSON.stringify(sway.user.channel));
     if (o) {
         output +=
             t.dataRow('absolute', o.absolute)
