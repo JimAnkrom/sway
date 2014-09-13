@@ -12,7 +12,6 @@ module.exports = {
     // Authenticate should validate and retrieve the user
     "authenticate": function (req, res, next) {
         // ensure user is valid
-
         var auth = req.body.token || req.body.user;
         var cookie = this.getCookie(req);
         if (cookie && cookie.uid) {
@@ -31,11 +30,14 @@ module.exports = {
             }
         } else {
             // lookup the user and append to the request
-            var user = sway.users.findByUid(auth.uid);
-            if (user) {
-                req.user = user;
-            } else {
-                this.setErrorMessage(res, 'User Not Found!');                
+            if (!auth.uid) this.setErrorMessage(res, 'User Not Found!');
+            else {
+                var user = sway.users.findByUid(auth.uid);
+                if (user) {
+                    req.user = user;
+                } else {
+                    this.setErrorMessage(res, 'User Not Found!');
+                }
             }
         }
         next();
@@ -52,7 +54,6 @@ module.exports = {
         // TODO: determine if a user was banned
         // Update the user channel info (move them along in the queue too
         sway.channels.update(user);
-
         next();
     },
     // User Services

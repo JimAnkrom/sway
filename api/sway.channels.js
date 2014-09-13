@@ -77,12 +77,13 @@ sway.channelControl = {
     },
     // remove a user from within the queue (not the same as dequeue!)
     remove: function (channel, user) {
+        //console.log('Removing')
         user.active = false;
         channel.users = _.reject(channel.users, function (u) {
             return u.uid == user.uid;
         });
         // ensure that if the user was the first one, we set the new one to active (should be picked up by the next poll interval
-        channel.users[0].active = true;
+        if (channel.users.length) channel.users[0].active = true;
     },
     // TODO: determine if user is active, and if not, check to see if users are idle
     update: function (user) {

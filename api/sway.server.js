@@ -8,7 +8,7 @@
 
 var sway = sway || {};
 sway.users = require('./sway.users');
-sway.channel = require('./sway.channels');
+sway.channels = require('./sway.channels');
 sway.control = require('./sway.control');
 sway.config = require('./sway.config.json');
 
@@ -40,6 +40,7 @@ module.exports = (function () {
             sway.users.clear();
         },
         expire: function (req, res, next) {
+            console.log("Removing user " + req.user.uid + " from channel " + req.user.channel.name);
             sway.channels.remove(req.user.channel, req.user);
             req.message = sway.config.messages.expirationMessage;
             next();

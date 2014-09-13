@@ -39,19 +39,19 @@ function authenticate (res, req, next) {
 
 // Create user router - must bypass auth routines
 var createRouter = express.Router();
-createRouter.post('/users', createUser);
+createRouter.post(config.api.users, createUser);
 createRouter.use(swayServer.finalizeUserResponse);
-app.post('/users', createRouter);
+app.post(config.api.users, createRouter);
 
 // authenticate all other requests
 app.use(authenticate);
-// remove users that have timed out
-app.delete('/users', swayServer.expire);
 
 // Router for all user calls
 var userRouter = express.Router();
-// Authorize these resquests as a user
+// Authorize these requests as a user
 userRouter.use(swayAuth.authUser);
+// remove users that have timed out
+userRouter.post(config.api.deleteUser, swayServer.expire);
 // submit control message
 userRouter.post(config.api.control, swayServer.control);
 // submit mapped osc message
@@ -62,6 +62,7 @@ userRouter.post(config.api.OSC, swayServer.sendOsc);
 userRouter.use(swayServer.finalizeUserResponse);
 
 // Wire the user router to api calls
+app.post(config.api.deleteUser, userRouter);
 app.post(config.api.control, userRouter);
 app.post(config.api.mappedOSC, userRouter);
 app.post(config.api.OSC, userRouter);

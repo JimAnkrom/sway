@@ -6,7 +6,8 @@
         "control": "/control",
         "mappedOSC": "/maposc",
         "OSC": "/osc",
-        "users": "/users"
+        "users": "/users",
+        "deleteUser": "/delete"
     },
     "server": {
         "address": "127.0.0.1",
