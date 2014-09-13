@@ -120,7 +120,7 @@ sway.motion = {
                             window.clearInterval(sway.poll);
                             // setTimeout for idle expiration
                             sway.idleTimeout = window.setTimeout(function () {
-                                sway.api.post(sway.config.url + sway.config.api.delete, sway.motion.current, {});
+                                sway.api.post(sway.config.url + sway.config.api.deleteUser, sway.motion.current, {});
                             }, sway.config.user.idleTimeout);
                             return;
                         } else {
@@ -158,7 +158,10 @@ sway.renderDebugEvent = function (panel, e) {
         t = sway.templates;
 
     var output = "<table>";
-    output += t.dataRow('Channel', JSON.stringify(sway.user.channel));
+    if (sway.user) {
+        output += t.dataRow('User Id', sway.user.token.uid);
+        output += t.dataRow('Channel', sway.user.channel.name);
+    }
     if (o) {
         output +=
             t.dataRow('absolute', o.absolute)
@@ -189,8 +192,6 @@ sway.renderDebugEvent = function (panel, e) {
 };
 
 window.addEventListener('load', function () {
-    alert("Sway v0.21.5!");
-
     var element = document.getElementById('debugPanel');
     if (element) {
         sway.debugPanel = element;

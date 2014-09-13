@@ -85,6 +85,7 @@ module.exports = {
             uid: user.uid
         };
         if (user.name) cookie.name = user.name;
+
         // TODO: Future. Because tracking MAC would be awesome
         //if (user.mac)  cookie.mac = user.mac;
 

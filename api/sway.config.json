@@ -18,7 +18,8 @@
         "defaultQueueSize": -1
     },
     "user": {
-        "idleTimeout": 120000
+        "controlInterval": 50,
+        "idleTimeout": 10000
     },
     "messages": {
         "expirationMessage": "You have been disconnected due to inactivity. Thank you for playing; we hope you'll visit us again soon!"

@@ -19,7 +19,14 @@ sway.debug = function (message) {
     }
 }
 sway.alert = function (message) {
-    window.alert(message);
+    if (message.isArray && message.isArray()) {
+        for (var i=0; i < message.length; i++)
+        {
+            window.alert(message[i]);
+        }
+    }
+    else
+        window.alert(message);
 }
 
 // Sway User Module
@@ -56,7 +63,7 @@ sway.config = {
         "users": "/users",
         "control": "/control",
         "osc": "/osc",
-        "delete": "/delete"
+        "deleteUser": "/delete"
     },
     update: function (config)  {
         if (!config) return;
@@ -69,12 +76,14 @@ sway.config = {
 
 // Sway API calls and utilities
 sway.api = {
+    // Handles standard Sway Server return messages (non-request specific)
     processResponse: function (data) {
         if (data.redirect) document.location.href = data.redirect;
-        if (data.token) sway.user.user = data.user;
+        if (data.user) sway.user.user = data.user;
         if (data.token) sway.user.token = data.token;
         if (data.channel) sway.user.channel = data.channel;
-        if (data.message) sway.alert(data.message);
+        if (data.messages) sway.alert(data.messages);
+
         sway.config.update(data.config);
     },
     delete: function (url, params, options) {

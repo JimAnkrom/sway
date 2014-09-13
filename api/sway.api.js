@@ -40,7 +40,9 @@ function authenticate (res, req, next) {
 // Create user router - must bypass auth routines
 var createRouter = express.Router();
 createRouter.post(config.api.users, createUser);
+createRouter.use(swayServer.updateUserConfig);
 createRouter.use(swayServer.finalizeUserResponse);
+// map the create user calls to the createRouter
 app.post(config.api.users, createRouter);
 
 // authenticate all other requests
@@ -58,6 +60,8 @@ userRouter.post(config.api.control, swayServer.control);
 userRouter.post(config.api.mappedOSC, swayServer.sendMapOsc);
 // submit osc message
 userRouter.post(config.api.OSC, swayServer.sendOsc);
+// short-circuit response if there is no need to send updates back to the client
+userRouter.use(swayServer.shortResponse);
 // finalize user request
 userRouter.use(swayServer.finalizeUserResponse);
 
