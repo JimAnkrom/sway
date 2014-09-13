@@ -45,6 +45,8 @@ app.post('/users', createRouter);
 
 // authenticate all other requests
 app.use(authenticate);
+// remove users that have timed out
+app.delete('/users', swayServer.expire);
 
 // Router for all user calls
 var userRouter = express.Router();

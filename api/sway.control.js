@@ -29,7 +29,7 @@ module.exports = (function (){
             if (cRoute) {
                 var cInput = control[inputType];
                 if (cInput) {
-                    sway.osc.send.apply(sway.osc, cRoute, cInput.alpha, cInput.beta, cInput.gamma);
+                    sway.osc.send(cRoute, cInput.alpha, cInput.beta, cInput.gamma);
                 }
             }
         },

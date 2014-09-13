@@ -39,27 +39,31 @@ module.exports = (function () {
         reset: function () {
             sway.users.clear();
         },
+        expire: function (req, res, next) {
+            sway.channels.remove(req.user.channel, req.user);
+            req.message = sway.config.messages.expirationMessage;
+            next();
+        },
         // Middleware to complete the response format and send it
         finalizeUserResponse: function (req, res) {
-            // TODO: Fill in all channel info
-            var chan = req.user.channel || {};
-
             var response = {
-                token: req.token,
-                channel: {
+                token: req.token
+            };
+            var chan = req.user.channel || {};
+            if (chan.name) {
+                response.channel = {
                     name: chan.name,
                     description: chan.description,
                     helpUrl: chan.helpUrl,
                     url: chan.url,
                     ip: chan.ip
-                }
-            };
+                };
+            }
+            if (req.message) response.message = req.message;
             // in case we want to pass some config back to the user.
             if (req.config) response.config = req.config;
 
             res.status(200).json(response);
-            // TODO : Is this res.end necessary?
-            res.end();
         },
 
         control: function (req, res) {

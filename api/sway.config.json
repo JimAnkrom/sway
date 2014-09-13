@@ -16,6 +16,12 @@
         "balancer": "roundrobin",
         "defaultQueueSize": -1
     },
+    "user": {
+        "idleTimeout": 120000
+    },
+    "messages": {
+        "expirationMessage": "You have been disconnected due to inactivity. Thank you for playing; we hope you'll visit us again soon!"
+    },
     "orientation": {
         "absolute": "",
         "alpha": "/orientation/alpha",

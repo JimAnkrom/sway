@@ -86,20 +86,35 @@ var sway = {
             sway.input.calibration.orientation = e;
             if (sway.user) {
                 if (sway.user.token) {
-                    //alert('orientation event ' + JSON.stringify(sway.user.token) );
 
                     sway.input.current = {token: sway.user.token, control: { orientation: {
                         alpha: e.alpha, beta: e.beta, gamma: e.gamma, absolute: e.absolute
                     }}};
+                    // set a value to compare to in setInterval closure
+                    var timestamp = Date.now();
+                    sway.input.timestamp = timestamp;
+
                     // Setting a 50ms gate for now... faster later? Who knows. ;)
                     if (!sway.poll) {
                         sway.poll = window.setInterval(function () {
+                            // if there has been no change in the timestamp, we are idle.
+                            if (sway.input.timestamp == timestamp) {
+                                window.clearInterval(sway.poll);
+                                // TODO: setTimeout for idle expiration
+                                sway.idleTimeout = window.setTimeout(function () {
+                                    sway.user.delete(sway.serverUrl + '/users', {}, {});
+                                }, 120000);
+                                return;
+                            }
                             sway.user.post(sway.serverUrl + '/control', sway.input.current, {})}, 50);
                     }
                 }
             } else {
                 alert('sway.user not set');
             }
+        },
+        compareControl: function (control1, control2) {
+
         },
         // DeviceMotionEvent handler
         handleMotionEvent: function (e) {

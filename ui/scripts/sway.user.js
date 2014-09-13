@@ -33,6 +33,9 @@ sway.serverUrl = 'http://192.168.1.100:1333';
                 }
             );
         },
+        delete: function (url, params, options) {
+            return this.request(url, 'DELETE', params, options);
+        },
         get: function (url, params, options) {
             return this.request(url, 'GET', params, options);
         },
