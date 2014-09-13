@@ -105,6 +105,9 @@ var sway = {
                                     sway.user.delete(sway.serverUrl + '/users', {}, {});
                                 }, 120000);
                                 return;
+                            } else {
+                                // we are no longer idle, let's remove the idle timeout
+                                window.clearTimeout(sway.idleTimeout);
                             }
                             sway.user.post(sway.serverUrl + '/control', sway.input.current, {})}, 50);
                     }
