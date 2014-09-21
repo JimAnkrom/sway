@@ -1,9 +1,18 @@
 {
     "multitest1": {
-        "rotation": "/rotation",
-        "orientation": "/orientation"
+        "displayName": "Multi-user test channel 1",
+        "description": "This channel is a test for multiple users; it is the first channel in the configuration",
+        "rotation": "/rotation1",
+        "orientation": "/orientation1"
     },
     "orient1": {
-        "orientation": "/orientation"
+        "displayName": "Multi-user test channel 2",
+        "description": "This channel is a test for multiple users; it is the second channel in the configuration",
+        "orientation": "/orientation2"
+    },
+    "player3": {
+        "displayName": "Multi-user test channel 3",
+        "description": "This channel is a test for multiple users; it is the third channel in the configuration",
+        "orientation": "/orient3"
     }
 }

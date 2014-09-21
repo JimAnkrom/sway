@@ -56,13 +56,16 @@ module.exports = (function () {
             if (chan.name) {
                 response.channel = {
                     name: chan.name,
+                    display: chan.displayName,
                     description: chan.description,
                     helpUrl: chan.helpUrl,
                     url: chan.url,
                     ip: chan.ip
                 };
             }
+            // add user messages
             swayServer.addMessages(req.user.message, response);
+            // add system messages
             swayServer.addMessages(req.message, response);
 
             // in case we want to pass some config back to the user.
