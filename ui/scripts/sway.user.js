@@ -8,7 +8,8 @@
 var sway = sway || {};
 // default config. Note that these values can be overwritten at any time by a message from sway
 sway.config = {
-    "url": 'http://192.168.1.100:1333',
+    "debug": "verbose",
+    "url": 'http://192.168.1.200:1333',
     "ui": {
         // maximum alert messages allowed
         "maxAlerts": 10
@@ -170,8 +171,11 @@ sway.api = {
             var message = JSON.stringify(params);
 
             http.open(verb, url, true);
-            //http.setRequestHeader('Content-type', 'application/json"');
+            http.setRequestHeader('Accept','*/*');
+            http.setRequestHeader('Content-Type', 'application/json');
+
             //http.setRequestHeader("Content-Length", message.length);
+            //http.send(params);
             http.send(message);
             return http;
         }
@@ -193,7 +197,8 @@ sway.renderDebugEvent = function (panel, e) {
     var output = "<table>";
     if (sway.user) {
         output += t.dataRow('User Id', sway.user.token.uid);
-        output += t.dataRow('Channel', sway.user.channel.name);
+        output += t.dataRow('Channel', sway.user.channel.display || sway.user.channel.name);
+        output += t.dataRow('Description', sway.user.channel.description);
     }
     if (o) {
         output +=

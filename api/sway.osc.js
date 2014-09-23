@@ -27,10 +27,11 @@ module.exports = (function (){
 
         switch (typeof arg) {
             case 'number':
-                if (Math.floor(arg)==arg)
-                    this.type = 'integer';
-                else
-                    this.type = 'float';
+                // Forcing all to float right now, because older smartphones are sending integer data.
+                //if (Math.floor(arg)==arg)
+                //    this.type = 'integer';
+                //else
+                this.type = 'float';
                 break;
             case 'string':
                 this.type = 'string';
@@ -43,12 +44,22 @@ module.exports = (function (){
     return {
         socket: null,
         send: function (address) {
-
             var message = new Message(address, arguments);
-           //
+
             var buffer = oscMin.toBuffer(message);
 
             this.socket.send(buffer, 0, buffer.length, config.server.port, config.server.address, function (err, bytes) {
+                if (err) { console.log('Error: ' + JSON.stringify(err)); }
+
+            });
+        },
+        // Not yet working
+        sendToAddress: function (ipAddress, port, address) {
+            var message = new Message(address, arguments);
+
+            var buffer = oscMin.toBuffer(message);
+
+            this.socket.send(buffer, 0, buffer.length, port, ipAddress, function (err, bytes) {
                 if (err) { console.log('Error: ' + JSON.stringify(err)); }
 
             });

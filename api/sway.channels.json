@@ -1,18 +1,31 @@
 {
-    "multitest1": {
+    "Player1": {
+        "address": "192.168.1.202",
+        "port": 6000,
         "displayName": "Multi-user test channel 1",
-        "description": "This channel is a test for multiple users; it is the first channel in the configuration",
-        "rotation": "/rotation1",
-        "orientation": "/orientation1"
+        "description": "This channel is the RED CUBE",
+        "rotation": "/rotation",
+        "orientation": "/orient/1"
     },
-    "orient1": {
+    "Player2": {
+        "address": "192.168.1.202",
+        "port": 6000,
         "displayName": "Multi-user test channel 2",
-        "description": "This channel is a test for multiple users; it is the second channel in the configuration",
-        "orientation": "/orientation2"
+        "description": "This channel is the GREEN CUBE",
+        "orientation": "/orient/2"
     },
     "player3": {
+        "address": "192.168.1.202",
+        "port": 6000,
         "displayName": "Multi-user test channel 3",
-        "description": "This channel is a test for multiple users; it is the third channel in the configuration",
-        "orientation": "/orient3"
+        "description": "This channel is the PINK CUBE",
+        "orientation": "/orient/3"
+    },
+    "player4": {
+        "address": "192.168.1.202",
+        "port": 6000,
+        "displayName": "Multi-user test channel 4",
+        "description": "This channel is the BLUE CUBE",
+        "orientation": "/orient/4"
     }
 }

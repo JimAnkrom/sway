@@ -16,14 +16,14 @@ var port = config.local.port;
 var userPage = 'user.html';
 var app = express();
 
-var allowCrossDomain = function(req, res, next) {
+var accessControlOptions = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', req.headers.origin || "*");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
 
-    // intercept OPTIONS preflight request
+    // respond immediately to OPTIONS preflight request
     if ('OPTIONS' == req.method) {
-        res.send(200);
+        res.status(200).end();
     }
     else {
         next();
@@ -37,7 +37,7 @@ var logHeaders = function (req, res, next) {
 
 if (debug) app.use(logHeaders);
 
-app.use(allowCrossDomain);
+app.use(accessControlOptions);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ type: '*/json' }));

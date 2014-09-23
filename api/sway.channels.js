@@ -88,14 +88,16 @@ sway.channelControl = {
     // TODO: determine if user is active, and if not, check to see if users are idle
     update: function (user) {
         // determine if they are in a channel or are requesting a channel
-        if (user.channel) { }
-        else {
-            sway.channels.assign(user);
-        }
-        // TODO: determine if they are the active user in that channel or not (queued)
-        // TODO: if they are not active, determine wait time
-        if (user.channel && !(user.active)) {
+        if (user) {
+            if (user.channel) { }
+            else {
+                sway.channels.assign(user);
+            }
+            // TODO: determine if they are the active user in that channel or not (queued)
+            // TODO: if they are not active, determine wait time
+            if (user.channel && !(user.active)) {
 
+            }
         }
     },
     // get next channel from load balancer.

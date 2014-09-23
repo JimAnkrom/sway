@@ -29,6 +29,8 @@ module.exports = (function (){
             if (cRoute) {
                 var cInput = control[inputType];
                 if (cInput) {
+
+                    // Currently - Yaw, Pitch, Roll (alpha, beta, gamma)
                     sway.osc.send(cRoute, cInput.alpha, cInput.beta, cInput.gamma);
                 }
             }

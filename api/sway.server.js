@@ -58,6 +58,7 @@ module.exports = (function () {
                     name: chan.name,
                     display: chan.displayName,
                     description: chan.description,
+                    userCount: chan.users.length,
                     helpUrl: chan.helpUrl,
                     url: chan.url,
                     ip: chan.ip
@@ -110,9 +111,11 @@ module.exports = (function () {
         },
         control: function (req, res, next) {
             var body = req.body;
-            var channel = req.user.channel;
-            if (channel && body.control) {
-                sway.control.control(channel, body.control);
+            if (req.user) {
+                var channel = req.user.channel;
+                if (channel && body.control) {
+                    sway.control.control(channel, body.control);
+                }
             }
             next();
         },

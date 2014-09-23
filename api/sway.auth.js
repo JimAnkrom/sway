@@ -29,14 +29,17 @@ module.exports = {
                 this.setErrorMessage(res, 'UID match failure!');
             }
         } else {
+            if (!auth) {
+                console.log()
+            }
             // lookup the user and append to the request
-            if (!auth.uid) this.setErrorMessage(res, 'User Not Found!');
+            if (!auth.uid) this.setErrorMessage(res, 'Authentication Error: User UID Not Found!');
             else {
                 var user = sway.users.findByUid(auth.uid);
                 if (user) {
                     req.user = user;
                 } else {
-                    this.setErrorMessage(res, 'User Not Found!');
+                    this.setErrorMessage(res, 'Authentication Error: User Not Found!');
                 }
             }
         }
