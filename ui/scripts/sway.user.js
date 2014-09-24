@@ -109,13 +109,15 @@ sway.user = {
 sway.api = {
     // Handles standard Sway Server return messages (non-request specific)
     processResponse: function (data) {
-        if (data.redirect) document.location.href = data.redirect;
         if (data.user) sway.user.user = data.user;
         if (data.token) sway.user.token = data.token;
         if (data.channel) sway.user.channel = data.channel;
         if (data.messages) sway.alert(data.messages);
 
         sway.config.update(data.config);
+        if (data.redirect) {
+            document.location.href = data.redirect;
+        }
     },
     addTokenToParams: function (params) {
         if (sway.user) {
@@ -140,6 +142,7 @@ sway.api = {
         var ooptions = options || {};
         if (window.XMLHttpRequest) {
             var http = new XMLHttpRequest();
+            http.withCredentials = true;
             options.responseType = options.responseType || "json";
             if (http.responseType) http.responseType = options.responseType;
 
@@ -191,7 +194,7 @@ sway.renderDebugEvent = function (panel, e) {
         m = c.motion,
         r = c.rotation,
         i = c.motionInterval,
-    //l = sway.location.current,
+        l = c.location,
         t = sway.templates;
 
     var output = "<table>";

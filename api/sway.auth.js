@@ -7,7 +7,7 @@
 var sway = sway || {};
 sway.users = require('./sway.users');
 sway.channels = require('./sway.channels.js');
-
+sway.userCookie = 'swayuser';
 module.exports = {
     // Authenticate should validate and retrieve the user
     "authenticate": function (req, res, next) {
@@ -71,7 +71,20 @@ module.exports = {
         var cookie = this.getCookie(req);
         if (cookie) {
             if (cookie.uid) {
-                req.body.uid = cookie.uid;
+                req.body.token = cookie;
+                var user = sway.users.findByUid(cookie.uid);
+                if (user) {
+                    // TODO: Probably want to do something else here rather than a reassign
+                    // reassign the user to a new channel
+                    sway.channels.reassign(user);
+                    req.user = user;
+                    req.token = {
+                        uid: user.uid,
+                        stamp: Date.now()
+                    };
+                    next();
+                    return;
+                }
             }
         }
         // create the user.
@@ -104,12 +117,13 @@ module.exports = {
     },
     setCookie: function (res, userCookie) {
         res.cookie(sway.userCookie, userCookie);
+        //console.log('Cookie Set: ' + JSON.stringify(userCookie));
     },
     getCookie: function (req) {
         if (req.cookies) {
             var cookie = req.cookies[sway.userCookie];
-            if (cookie)
-                return JSON.parse(cookie);
+            //console.log('Cookie found! ' + JSON.stringify(cookie));
+            return cookie;
         }
     }
 // ,

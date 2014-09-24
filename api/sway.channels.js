@@ -113,11 +113,21 @@ sway.channelControl = {
         this.overflowQueue.push(user);
         return;
     },
+    reassign: function (user) {
+        if (user.channel) this.remove(user.channel, user);
+        this.assign(user);
+        return;
+    },
     middleware: {
         assignChannel: function (req, res, next) {
             var user = req.body.user;
             if (!user.channel) {
                 sway.channelControl.assign(user);
+                // Tell the client to redirect.
+                if (user.channel.redirect)
+                {
+                    req.redirect = user.channel.redirect;
+                }
             }
             next();
         }

@@ -8,6 +8,7 @@ var debug = false;
 var fs = require('fs');
 var express = require('express');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var swayServer = require('./sway.server');
 var swayAuth = require('./sway.auth');
 var config = require('./sway.config.json');
@@ -16,8 +17,10 @@ var port = config.local.port;
 var userPage = 'user.html';
 var app = express();
 
+
 var accessControlOptions = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', req.headers.origin || "*");
+    res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
 
@@ -38,7 +41,7 @@ var logHeaders = function (req, res, next) {
 if (debug) app.use(logHeaders);
 
 app.use(accessControlOptions);
-
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ type: '*/json' }));
 app.use(bodyParser.json({ type: 'text/plain' }));
@@ -90,7 +93,6 @@ app.post(config.api.deleteUser, userRouter);
 app.post(config.api.control, userRouter);
 app.post(config.api.mappedOSC, userRouter);
 app.post(config.api.OSC, userRouter);
-
 
 // Wire the admin router to api calls
 var adminRouter = express.Router();

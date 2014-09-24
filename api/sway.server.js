@@ -81,6 +81,7 @@ module.exports = (function () {
 
             // return our response
             res.status(200).json(response);
+
         },
         updateUserConfig: function (req, res, next) {
             req.config = {
