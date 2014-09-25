@@ -166,6 +166,13 @@ sway.balancer = {
         // TODO: Check to ensure queue has space
         return sway.channelControl.channels[this.deck[this.index++]];
     },
+    // find the first available channel starting from top, if none are empty, return last.
+    waterfall: function () {
+        return _.find(sway.channelControl.channels, function (chan) {
+            return !(chan.users.length);
+        })
+            || sway.channelControl.channels[c.users.length-1];
+    },
     // find the relatively emptiest channel and add user
     weighted: function () {
         var sorted = _.sortBy(sway.channelControl.channels, function (chan) {
