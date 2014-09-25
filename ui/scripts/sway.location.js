@@ -13,6 +13,11 @@ sway.location = {
         }
     },
     handlePosition: function (position) {
+        sway.calibration.position = position;
+
+        if (sway.debugPanel) {
+            sway.renderDebugEvent.call(sway, sway.debugPanel, e);
+        }
         // position.coords.latitude
         // position.coords.longitude
         // position.coords.accuracy
@@ -21,4 +26,10 @@ sway.location = {
         // position.coords.heading
         // position.coords.speed
     }
-}
+};
+
+var oninitOld = sway.oninitialized;
+sway.oninitialized = function () {
+    sway.location.init();
+    oninitOld();
+};

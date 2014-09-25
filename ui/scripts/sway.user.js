@@ -53,7 +53,6 @@ sway.templates = {
 };
 sway.init = function () {
     if (window.location.origin != sway.hostname) {
-        alert(window.location.origin);
         window.location.href = sway.hostname;
         return;
     }
@@ -200,7 +199,8 @@ sway.renderDebugEvent = function (panel, e) {
         m = c.motion,
         r = c.rotation,
         i = c.motionInterval,
-        l = c.location,
+        ic = sway.motion.icon.style,
+        //l = c.location,
         t = sway.templates;
 
     var output = "<table>";
@@ -229,6 +229,12 @@ sway.renderDebugEvent = function (panel, e) {
             t.dataRow('rot alpha', r.alpha)
             + t.dataRow('rot beta', r.beta)
             + t.dataRow('rot gamma', r.gamma);
+    }
+    if (ic) {
+        output +=
+            t.dataRow('Left', ic.left)
+            + t.dataRow('Top', ic.top)
+
     }
     //+ t.dataRow('interval', i)
     //+ t.dataRow('latitude', l.latitude)

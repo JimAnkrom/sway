@@ -79,6 +79,11 @@ module.exports = (function () {
             }
             if (config) response.config = config;
 
+            //Add redirects if necessary
+            if (req.redirect) {
+                console.log('Redirect: ' + req.redirect);
+                response.redirect = req.redirect;
+            }
             // return our response
             res.status(200).json(response);
 

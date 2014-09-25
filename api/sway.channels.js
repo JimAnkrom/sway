@@ -116,6 +116,8 @@ sway.channelControl = {
     reassign: function (user) {
         if (user.channel) this.remove(user.channel, user);
         this.assign(user);
+        // Tell the client to redirect ONLY when we assign a channel
+
         return;
     },
     middleware: {
@@ -123,9 +125,10 @@ sway.channelControl = {
             var user = req.body.user;
             if (!user.channel) {
                 sway.channelControl.assign(user);
-                // Tell the client to redirect.
+                // Tell the client to redirect ONLY when we assign a channel
                 if (user.channel.redirect)
                 {
+                    console.log("assigning redirect to req");
                     req.redirect = user.channel.redirect;
                 }
             }

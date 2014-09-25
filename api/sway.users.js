@@ -38,7 +38,6 @@ module.exports = (function () {
                 return options;
             } else {
                 // Try again to get a new datetime stamp, since we were lucky in our request and one already exists
-                console.log("is this our loop?");
                 return this.createUser.call(this, options);
             }
         },

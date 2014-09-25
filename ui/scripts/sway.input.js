@@ -82,6 +82,26 @@ sway.motion = {
     // TODO: DeviceMotionEvent.interval
     // TODO: DeviceMotionEvent.rotationRate
     motion: null,
+    icon: null,
+    renderIcon: function (e) {
+        if (!sway.motion.icon) {
+            var icon = document.createElement('img');
+            icon.style.position = 'absolute';
+            icon.style.zIndex = 100;
+            sway.motion.icon = icon;
+            document.body.appendChild(sway.motion.icon);
+            icon.src = '/images/videobleepicon.gif';
+        }
+        // beta - pitch - is -180 upside-down from pointing forward, 180 upsidedown from tilting back (towards user)
+        var posTop = Math.round(((e.beta + 180)/360)*100);
+        // gamma - roll - is -90 full to left, 90 full to right; or 0 to 180 corrected
+        var posLeft = Math.round(((e.gamma + 90)/180)*100);
+
+        sway.motion.icon.style.left = posLeft + '%';
+
+        sway.motion.icon.style.top = posTop + '%';
+
+    },
     // DeviceOrientationEvent handler
     handleOrientationEvent: function (e) {
 //            if (!calibration) {
@@ -93,6 +113,9 @@ sway.motion = {
 
             sway.renderDebugEvent(sway.debugPanel, e);
         }
+
+        sway.motion.renderIcon(e);
+
         sway.motion.calibration.orientation = e;
 
         sway.motion.current = { control: { orientation: {

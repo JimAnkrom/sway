@@ -17,8 +17,7 @@ var port = config.local.port;
 var userPage = 'user.html';
 var app = express();
 
-
-var accessControlOptions = function(req, res, next) {
+function accessControlOptions (req, res, next) {
     res.header('Access-Control-Allow-Origin', req.headers.origin || "*");
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -31,12 +30,12 @@ var accessControlOptions = function(req, res, next) {
     else {
         next();
     }
-};
+}
 
-var logHeaders = function (req, res, next) {
+function logHeaders (req, res, next) {
     console.log(req.headers);
     next();
-};
+}
 
 if (debug) app.use(logHeaders);
 

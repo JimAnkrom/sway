@@ -77,6 +77,11 @@ module.exports = {
                     // TODO: Probably want to do something else here rather than a reassign
                     // reassign the user to a new channel
                     sway.channels.reassign(user);
+                    if (user.channel.redirect)
+                    {
+                        console.log("assigning redirect to req");
+                        req.redirect = user.channel.redirect;
+                    }
                     req.user = user;
                     req.token = {
                         uid: user.uid,
@@ -107,6 +112,10 @@ module.exports = {
 
         this.setCookie(res, cookie);
         sway.channels.assign(user);
+        if (user.channel.redirect)
+        {
+            req.redirect = user.channel.redirect;
+        }
         req.user = user;
         next();
     },

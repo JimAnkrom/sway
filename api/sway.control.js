@@ -23,6 +23,7 @@ module.exports = (function (){
             // we only care about the channel configuration, so use that
             this.processMotion(channel, control, 'rotation');
             this.processMotion(channel, control, 'orientation');
+            this.processLocation(channel, control, 'location');
         },
         processMotion: function (channel, control, inputType) {
             var cRoute = channel[inputType]
@@ -32,6 +33,15 @@ module.exports = (function (){
 
                     // Currently - Yaw, Pitch, Roll (alpha, beta, gamma)
                     sway.osc.send(cRoute, cInput.alpha, cInput.beta, cInput.gamma);
+                }
+            }
+        },
+        processLocation: function (channel, control, inputType) {
+            var cRoute = channel[inputType]
+            if (cRoute) {
+                var cInput = control[inputType];
+                if (cInput) {
+                    // TODO: what do we want to do with location...?
                 }
             }
         },
