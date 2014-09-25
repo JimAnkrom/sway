@@ -7,6 +7,7 @@
  */
 var sway = sway || {};
 // default config. Note that these values can be overwritten at any time by a message from sway
+sway.hostname = "http://www.videobleep.tv";
 sway.config = {
     "debug": "verbose",
     "url": 'http://192.168.1.200:1333',
@@ -51,6 +52,11 @@ sway.templates = {
     }
 };
 sway.init = function () {
+    if (window.location.origin != sway.hostname) {
+        alert(window.location.origin);
+        window.location.href = sway.hostname;
+        return;
+    }
     if (!(sway.config.url)) return sway.debug('sway.config.url is not set!');
     sway.user.authorize();
 
