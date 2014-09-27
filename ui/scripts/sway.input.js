@@ -118,8 +118,11 @@ sway.motion = {
 
         sway.motion.calibration.orientation = e;
 
+        // Fix for #49, prefer webkitCompassHeading if available.
+        var correctAlpha = e.webkitCompassHeading || e.alpha;
+
         sway.motion.current = { control: { orientation: {
-            alpha: e.alpha, beta: e.beta, gamma: e.gamma, absolute: e.absolute
+            alpha: correctAlpha, beta: e.beta, gamma: e.gamma, absolute: e.absolute
         }}};
 
         // set a value to compare to in setInterval closure

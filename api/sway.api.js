@@ -10,10 +10,12 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var swayServer = require('./sway.server');
+var swayMonitor = require('./sway.monitor');
 var swayAuth = require('./sway.auth');
 var config = require('./sway.config.json');
 
-var port = config.local.port;
+var port = parseInt(process.argv[2], 10) || config.local.port;
+
 var userPage = 'user.html';
 var app = express();
 
@@ -45,7 +47,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ type: '*/json' }));
 app.use(bodyParser.json({ type: 'text/plain' }));
 
+// For all requests...
 app.all('*', function(req, res, next) {
+    swayMonitor.takeSample.call(swayMonitor);
     res.set('Content-Type', 'application/json');
     next();
 });
