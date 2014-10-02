@@ -60,6 +60,8 @@ sway.channelControl = {
             // channel is empty
             if (!(channel.users)) channel.users = [];
         }
+        // If we've got a sneaky user trying to hop out of their channel, at the least remove them from the channel they were in
+        if (user.channel) sway.channelControl.remove(user.channel, user);
         // We're good, add to the queue
         channel.users.push(user);
         // ensure the first user in queue is still active (maybe it's our new user, who cares)
@@ -79,6 +81,7 @@ sway.channelControl = {
     remove: function (channel, user) {
         //console.log('Removing')
         user.active = false;
+        user.channel = null;
         channel.users = _.reject(channel.users, function (u) {
             return u.uid == user.uid;
         });
@@ -91,7 +94,7 @@ sway.channelControl = {
         if (user) {
             if (user.channel) { }
             else {
-                sway.channels.assign(user);
+                sway.channelControl.assign(user);
             }
             // TODO: determine if they are the active user in that channel or not (queued)
             // TODO: if they are not active, determine wait time
@@ -102,10 +105,10 @@ sway.channelControl = {
     },
     // get next channel from load balancer.
     assign: function (user) {
-
         var channel = this.LoadBalancer.call(sway.balancer);
         // if channel is null, we need to put the user into the overflow queue
         if (channel) {
+            this.compact(channel);
             return this.enqueue(channel, user);
         }
         // console.log("Balancer: " + sway.config.channel.balancer);
@@ -113,13 +116,20 @@ sway.channelControl = {
         this.overflowQueue.push(user);
         return;
     },
+    // reassign a user to a new queue
     reassign: function (user) {
         if (user.channel) this.remove(user.channel, user);
         this.assign(user);
         // Tell the client to redirect ONLY when we assign a channel
-
         return;
     },
+    // Remove all users with expire = true
+    compact: function (channel) {
+        channel.users = _.reject(channel.users, function (u) {
+            return u.expired;
+        });
+    },
+    // Channel middleware
     middleware: {
         assignChannel: function (req, res, next) {
             var user = req.body.user;

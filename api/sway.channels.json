@@ -2,9 +2,8 @@
     "Player1": {
         "address": "192.168.1.202",
         "port": 6000,
-        "displayName": "Multi-user test channel 1",
+        "displayName": "Welcome to Channel 1",
         "description": "This channel is the RED CUBE",
-        "rotation": "/rotation",
         "orientation": "/orient/1"
     },
     "Player2": {
@@ -14,27 +13,46 @@
         "description": "This channel is the GREEN CUBE",
         "orientation": "/orient/2"
     },
-    "player3": {
+    "Player3": {
         "address": "192.168.1.202",
         "port": 6000,
         "displayName": "Multi-user test channel 3",
         "description": "This channel is the PINK CUBE",
         "orientation": "/orient/3"
     },
-    "player4": {
+    "Player4": {
         "address": "192.168.1.202",
         "port": 6000,
         "displayName": "Multi-user test channel 4",
         "description": "This channel is the BLUE CUBE",
         "orientation": "/orient/4"
     },
-    "location1": {
+    "Player5": {
         "address": "192.168.1.202",
         "port": 6000,
-        "redirect": "location.html",
-        "displayName": "Multi-user test channel 5",
-        "description": "This channel is a location test",
-        "location": "/location1"
+        "displayName": "Welcome to Channel 5",
+        "description": "This channel is the RED CUBE",
+        "orientation": "/orient/5"
     },
-    "location2": {}
+    "Player6": {
+        "address": "192.168.1.202",
+        "port": 6000,
+        "displayName": "Multi-user test channel 6",
+        "description": "This channel is the GREEN CUBE",
+        "orientation": "/orient/6"
+    },
+    "Player7": {
+        "address": "192.168.1.202",
+        "port": 6000,
+        "displayName": "Multi-user test channel 7",
+        "description": "This channel is the PINK CUBE",
+        "orientation": "/orient/7"
+    },
+    "Player8": {
+        "address": "192.168.1.202",
+        "port": 6000,
+        "displayName": "Multi-user test channel 8",
+        "description": "This channel is the BLUE CUBE",
+        "orientation": "/orient/8"
+    }
 }

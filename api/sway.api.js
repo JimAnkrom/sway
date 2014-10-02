@@ -10,12 +10,12 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var swayServer = require('./sway.server');
-var swayMonitor = require('./sway.monitor');
+// TODO : Re-include this
+//var swayMonitor = require('./sway.monitor');
 var swayAuth = require('./sway.auth');
 var config = require('./sway.config.json');
-
+// allow passing in port as an override
 var port = parseInt(process.argv[2], 10) || config.local.port;
-
 var userPage = 'user.html';
 var app = express();
 
@@ -39,7 +39,14 @@ function logHeaders (req, res, next) {
     next();
 }
 
-if (debug) app.use(logHeaders);
+// TODO : improve logging
+//if (debug) app.use(logHeaders);
+
+// TODO: Report back on monitor timing
+//swayMonitor.onSampling = function (frame) {
+//    console.log("Int: " + JSON.stringify(frame.intervals));
+//    console.log("Dur: " + JSON.stringify(frame.durations));
+//};
 
 app.use(accessControlOptions);
 app.use(cookieParser());
@@ -49,7 +56,8 @@ app.use(bodyParser.json({ type: 'text/plain' }));
 
 // For all requests...
 app.all('*', function(req, res, next) {
-    swayMonitor.takeSample.call(swayMonitor);
+    // TODO: Include this instrumentation
+    //swayMonitor.takeSample.call(swayMonitor);
     res.set('Content-Type', 'application/json');
     next();
 });
@@ -61,7 +69,6 @@ function createUser (res, req, next) {
 function authenticate (res, req, next) {
     swayAuth.authenticate.call(swayAuth, res, req, next);
 }
-
 
 // Create user router - must bypass auth routines
 var createRouter = express.Router();
@@ -86,6 +93,8 @@ userRouter.post(config.api.control, swayServer.control);
 userRouter.post(config.api.mappedOSC, swayServer.sendMapOsc);
 // submit osc message
 userRouter.post(config.api.OSC, swayServer.sendOsc);
+//TODO: Find a good place for this (instrumentation)
+//userRouter.use(function () { swayMonitor.currentFrame.setDuration(); });
 // short-circuit response if there is no need to send updates back to the client
 userRouter.use(swayServer.shortResponse);
 // finalize user request

@@ -8,12 +8,18 @@ var sway = sway || {};
 sway.location = {
     init: function () {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(sway.location.handlePosition);
-            navigator.geolocation.watchPosition(sway.location.handlePosition);
+            var options = {
+                enableHighAccuracy: false,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            navigator.geolocation.getCurrentPosition(sway.location.handlePosition, function () {}, options);
+            navigator.geolocation.watchPosition(sway.location.handlePosition, function () {}, options);
         }
     },
     handlePosition: function (position) {
-        sway.calibration.position = position;
+        sway.motion.calibration.position = position;
 
         if (sway.debugPanel) {
             sway.renderDebugEvent.call(sway, sway.debugPanel, e);

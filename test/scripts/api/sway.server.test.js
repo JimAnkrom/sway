@@ -109,7 +109,8 @@ exports.tests = {
         // assert
         test.ok(channel != null, 'First user did not receive channel!');
         test.ok(req2.user.channel != null, 'Second user did not receive channel!');
-        test.ok(channel.name != req2.user.channel.name, 'Users were assigned same channel!');
+
+        test.ok(channel.name != req2.user.channel.name, 'Users were assigned same channel - ' + channel.name);
         test.done();
     },
     Server_createUsers_ReturnsDifferentToken: function (test) {
@@ -159,7 +160,7 @@ exports.tests = {
         }, res1.response.cookie);
         var res2 = new StubResponse();
 
-        swayServer.control(req2, res2);
+        swayServer.control(req2, res2, function () {});
 
         // assert
         test.done();

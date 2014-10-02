@@ -17,7 +17,7 @@ module.exports = {
         if (cookie && cookie.uid) {
             if (auth.uid) {
                 if (auth.uid != cookie.uid) {
-                    // TODO : ?
+                    // TODO : When would this be true?
                     this.setErrorMessage(res, 'UID match failure!');
                 }
             } else {
@@ -25,6 +25,8 @@ module.exports = {
             }
         }
         if (req.body.user) {
+            // TODO: When should this be true?
+            req.body.user.lastLogin = Date.now();
             if (auth.uid != req.body.user.uid) {
                 this.setErrorMessage(res, 'UID match failure!');
             }
@@ -36,6 +38,7 @@ module.exports = {
             if (!auth.uid) this.setErrorMessage(res, 'Authentication Error: User UID Not Found!');
             else {
                 var user = sway.users.findByUid(auth.uid);
+                user.lastLogin = Date.now();
                 if (user) {
                     req.user = user;
                 } else {
@@ -112,9 +115,10 @@ module.exports = {
 
         this.setCookie(res, cookie);
         sway.channels.assign(user);
-        if (user.channel.redirect)
-        {
-            req.redirect = user.channel.redirect;
+        if (user.channel) {
+            if (user.channel.redirect) {
+                req.redirect = user.channel.redirect;
+            }
         }
         req.user = user;
         next();

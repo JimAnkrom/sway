@@ -6,12 +6,15 @@
  * - Is the authority on uid generation.
  */
 var _ = require('underscore');
+var config = require('./sway.config.json');
 var userList = [];
 var idList = [];
 
 module.exports = (function () {
 
     var usersService = {
+        onExpireUser: null,
+        onExpireUserBatch: null,
         findAll: function () {
             return userList;
         },
@@ -25,14 +28,37 @@ module.exports = (function () {
                 return u.uid == uid;
             });
         },
+        // Expire / scavenge cache 
+        expire: function () {
+            var newUserList = [];
+            var expiredUserBatch = [];
+            var timeoutLower = Date.now() - config.users.timeout;
+            for (var i=0; i < userList.length; i++)
+            {
+                var u = userList[i];
+                if (u.lastLogin && (u.lastLogin < timeoutLower)) {
+                    if (usersService.onExpireUser) usersService.onExpireUser(u);
+                    u.expired = true;
+                    console.log('Expired user ' + u.uid);
+                    expiredUserBatch.push(u);
+                } else {
+                    newUserList.push(u);
+                }
+            }
+            if (usersService.onExpireUserBatch) usersService.onExpireUserBatch(expiredUserBatch);
+            userList = newUserList;
+        },
         // Add a user to the system. Should return the user.
         createUser: function (options) {
-            var uid = options.uid || Date.now();
+            this.expire();
+            var timeNow = Date.now();
+            var uid = options.uid || timeNow;
             // If this ever is on a multi-threaded system this could cause duplicate ids without a locking scheme.
             // Not super likely considering the use case, but these things keep me up at night.
             if (idList.indexOf(uid) == -1) {
                 idList.push(uid);
                 options.uid = uid;
+                options.lastLogin = timeNow;
                 var id = userList.push(options);
                 options.id = id;
                 return options;

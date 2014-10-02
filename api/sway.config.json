@@ -3,7 +3,10 @@
         "address": "http://www.videobleep.tv"
     },
     "local": {
-        "port": 1333
+        "port": 1000
+    },
+    "users": {
+        "timeout": 30000
     },
     "api": {
         "control": "/control",

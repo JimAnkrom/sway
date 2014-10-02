@@ -7,10 +7,10 @@
  */
 var sway = sway || {};
 // default config. Note that these values can be overwritten at any time by a message from sway
-sway.hostname = "http://www.videobleep.tv";
+sway.hostname = "http://sway.videobleep.tv";
 sway.config = {
     "debug": "verbose",
-    "url": 'http://192.168.1.200:1333',
+    "url": 'http://192.168.1.250:1000',
     "ui": {
         // maximum alert messages allowed
         "maxAlerts": 10
@@ -200,7 +200,7 @@ sway.renderDebugEvent = function (panel, e) {
         r = c.rotation,
         i = c.motionInterval,
         ic = sway.motion.icon.style,
-        //l = c.location,
+        p = c.position,
         t = sway.templates;
 
     var output = "<table>";
@@ -224,11 +224,27 @@ sway.renderDebugEvent = function (panel, e) {
 
     }
     if (r) {
-
         output +=
             t.dataRow('rot alpha', r.alpha)
             + t.dataRow('rot beta', r.beta)
             + t.dataRow('rot gamma', r.gamma);
+    }
+    // position.coords.latitude
+    // position.coords.longitude
+    // position.coords.accuracy
+    // position.coords.altitude
+    // position.coords.altitudeAccuracy
+    // position.coords.heading
+    // position.coords.speed
+    if (p) {
+        output +=
+        t.dataRow('latitude', p.coords.latitude)
+        + t.dataRow('longitude', p.coords.longitude)
+        + t.dataRow('accuracy', p.coords.accuracy)
+            + t.dataRow('altitude', p.coords.altitude)
+            + t.dataRow('altitudeAccuracy', p.coords.altitudeAccuracy)
+        + t.dataRow('accuracy', p.coords.heading)
+        + t.dataRow('altitude', p.coords.speed);
     }
     if (ic) {
         output +=
@@ -236,10 +252,7 @@ sway.renderDebugEvent = function (panel, e) {
             + t.dataRow('Top', ic.top)
 
     }
-    //+ t.dataRow('interval', i)
-    //+ t.dataRow('latitude', l.latitude)
-    //+ t.dataRow('longitude', l.longitude)
-    //+ t.dataRow('altitude', l.altitude),
+
     output += "</table>";
     sway.debugPanel.innerHTML = output;
 };

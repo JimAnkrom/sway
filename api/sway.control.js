@@ -52,7 +52,7 @@ module.exports = (function (){
             return sway.state;
         },
         send: function (address) {
-            if (address) sway.osc.send.apply(sway.osc, address, arguments);
+            if (address) sway.osc.send.apply(sway.osc, arguments);// sway.osc, address, arguments);
             return null;
         },
         shutdown: function () {

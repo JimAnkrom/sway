@@ -119,8 +119,9 @@ sway.motion = {
         sway.motion.calibration.orientation = e;
 
         // Fix for #49, prefer webkitCompassHeading if available.
-        var correctAlpha = e.webkitCompassHeading || e.alpha;
-
+        var correctAlpha = e.alpha;
+        if (!e.absolute) correctAlpha = e.webkitCompassHeading;
+        correctAlpha = 360 - correctAlpha;
         sway.motion.current = { control: { orientation: {
             alpha: correctAlpha, beta: e.beta, gamma: e.gamma, absolute: e.absolute
         }}};

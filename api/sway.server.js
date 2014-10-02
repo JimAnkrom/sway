@@ -14,6 +14,11 @@ sway.config = require('./sway.config.json');
 
 var _ = require('underscore');
 
+// TODO: convert this to a 'addHandler' approach instead of just set handler
+sway.users.onExpireUserBatch = function (batch) {
+
+};
+
 sway.authorization = {
     // Auth can be one of the following values:
     queued: 0,

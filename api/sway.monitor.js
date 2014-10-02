@@ -27,6 +27,7 @@ sway.monitor = {
         maxSamples: 300
     },
     samples: [],
+    previousTime: Date.now(),
     onSampling: null,
     takeSample: function () {
         var cfg = sway.monitor.config;
@@ -53,20 +54,37 @@ sway.monitor.Sample = function (id, stamp) {
     this.stamp = stamp;
     this.maxInterval = 0;
     // need some non-zero number because we're testing for lesser numbers, and if we set this to 0 it will stay 0
-    this.minInterval = stamp;
+    this.minInterval = 50000;
     this.requestCount = 0;
     this.intervalSum = 0;
+    this.intervals = [];
+    this.durations = [];
+
 };
 // encapsulates the setAverage logic; it's simple, but don't want it hanging around for someone to modify for no good reason
 sway.monitor.Sample.prototype.setAverage = function () {
-    this.avgInterval = this.intervalSum / this.requestCount;
+    var count;
+    // divide by zero to start it off, eh? Good job.
+    if (!this.requestCount) count = 1;
+    this.avgInterval = this.intervalSum / count;
 };
+// encapsulates the setAverage logic; it's simple, but don't want it hanging around for someone to modify for no good reason
+sway.monitor.Sample.prototype.setDuration = function () {
+    this.durations.push(Date.now() - sway.monitor.previousTime);
+};
+
 // Set request interval data
 sway.monitor.Sample.prototype.setIntervals = function (currentTime) {
-    var interval = currentTime - stamp;
+    var interval = currentTime - sway.monitor.previousTime;
+    sway.monitor.previousTime = currentTime;
+    this.intervals.push(interval);
     this.requestCount++;
     this.intervalSum += interval;
-    if (this.maxInterval < interval) this.maxInterval = interval;
+    if (this.maxInterval < interval)
+        this.maxInterval = interval;
+    else {
+        if (this.normalInterval < interval) this.normalInterval = interval;
+    }
     if (this.minInterval > interval) this.minInterval = interval;
 };
 
