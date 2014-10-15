@@ -1,10 +1,67 @@
 /**
+ *
+ * Sway Core Input Library
  * Created by Jim Ankrom on 7/30/2014.
  *
  * sway.input should handle input from html control based input, such as clicks, sliders, knobs, etc.
  *
  */
 var sway = sway || {};
+sway.data = sway.data || {};
+
+/**
+ * Sway.data.transformation - Scale and constrain data to appropriate values
+ */
+sway.data.transform = {
+    // transform a value to given scale, based on its ratio within a constraint range.
+    scaleValue: function (value, scale, constraints) {
+        // We cannot scale without constraints
+        if (!constraints) return value;
+        console.log("here");
+        var constrainedValue = this.constrainValue(value, constraints);
+
+        if (scale) {
+            var absoluteValue = value;
+            var ratio = this.ratioValue(constrainedValue, constraints);
+            if (ratio != null) {
+                var scaleRange = scale.max - scale.min;
+                var relativeOffset = ratio * scaleRange;
+                absoluteValue = relativeOffset + scale.min;
+            }
+
+            return absoluteValue;
+        }
+        // this MUST return an unaffected value if scale or constraints don't exist
+        return constrainedValue;
+    },
+    // Get the ratio of the value to the size of the constraint range
+    ratioValue: function (value, constraints) {
+        if (constraints) {
+            var rangeSize = constraints.ceiling - constraints.floor;
+            var adjustedValue = value - constraints.floor;
+            return adjustedValue / rangeSize;
+        }
+    },
+    // Constrain a value to given thresholds
+    constrainValue: function (value, constraints) {
+        if (constraints) {
+            if (value < constraints.floor) return constraints.floor;
+            if (value > constraints.ceiling) return constraints.ceiling;
+        }
+        return value;
+    },
+    // TODO: this needs to get the scale & constraint from whatever level in the config it is at
+    transformValues: function (valueHash, config) {
+        var keys = valueHash.keys();
+        for (var i=0; i<keys.length; i++) {
+            var key = keys[i];
+            var keyConfig = config[key];
+            var scaleConfig = keyConfig.scale || config.scale;
+            var constraintsConfig = keyConfig.constraints || config.constraints;
+            valueHash[key] = this.scaleValue(valueHash[key], scaleConfig, constraintsConfig);
+        }
+    }
+};
 
 // Handle basic input
 sway.input = {
@@ -28,6 +85,8 @@ sway.input = {
 
     }
 };
+
+
 
 
 /**
@@ -109,38 +168,60 @@ sway.motion = {
 //                // We may be able to have them point to "the djs" first, or even run a system calibration to establish where the compass heading is.
 //                this.calibration = e;
 //            }
-        if (sway.debugPanel) {
-
-            sway.renderDebugEvent(sway.debugPanel, e);
-        }
 
         sway.motion.renderIcon(e);
 
-        sway.motion.calibration.orientation = e;
 
-        // Fix for #49, prefer webkitCompassHeading if available.
-        var correctAlpha = e.alpha;
-        if (!e.absolute) correctAlpha = e.webkitCompassHeading;
-        correctAlpha = 360 - correctAlpha;
-        sway.motion.current = { control: { orientation: {
-            alpha: correctAlpha, beta: e.beta, gamma: e.gamma, absolute: e.absolute
-        }}};
+        // android - iphone
+        //
 
-        // set a value to compare to in setInterval closure
-        var timestamp = Date.now();
-        sway.motion.timestamp = timestamp;
+        var plugin = sway.config.channel.plugin;
+        var pluginConfig = sway.config.channel[plugin];
 
-        // Setting a 50ms gate for now... faster later? Who knows. ;)
-        if (!sway.poll) {
-            sway.poll = window.setInterval(function () {
-                // if there has been no change in the timestamp, we are idle
-                var isIdle = (sway.motion.timestamp == timestamp);
-                if (sway.motion.idle(isIdle)) {
-                    window.clearInterval(sway.poll);
-                    return;
-                }
-                sway.api.post(sway.config.url + sway.config.api.control, sway.motion.current, {})
-            }, sway.config.user.controlInterval);
+        // if we don't have orientation in the plugin, do nothing
+        if (pluginConfig && pluginConfig.orientation) {
+            // Fix for #49, prefer webkitCompassHeading if available.
+            var correctAlpha = e.alpha;
+            if (!e.absolute) correctAlpha = e.webkitCompassHeading;
+
+            // invert compass
+            correctAlpha = 360 - correctAlpha;
+
+            this.calibration.orientation = e;
+            this.calibration.compassHeading = e.webkitCompassHeading;
+            this.calibration.correctAlpha = correctAlpha;
+
+            var o = {
+                alpha: correctAlpha,
+                beta: e.beta,
+                gamma: e.gamma,
+                absolute: e.absolute
+            };
+
+            // set a value to compare to in setInterval closure
+            var timestamp = Date.now();
+            sway.motion.timestamp = timestamp;
+
+            // transform the values
+            sway.data.transform.transformValues(o, pluginConfig.orientation);
+            sway.motion.current = { control: { orientation: o}};
+
+            // Set the throttle for input
+            if (!sway.poll) {
+                sway.poll = window.setInterval(function () {
+                    // if there has been no change in the timestamp, we are idle
+                    var isIdle = (sway.motion.timestamp == timestamp);
+                    if (sway.motion.idle(isIdle)) {
+                        window.clearInterval(sway.poll);
+                        return;
+                    }
+                    sway.api.post(sway.config.url + sway.config.api.control, sway.motion.current, {});
+                }, sway.config.user.controlInterval);
+            }
+        }
+
+        if (sway.debugPanel) {
+            sway.renderDebugEvent.call(this, sway.debugPanel, e);
         }
     },
     // DeviceMotionEvent handler

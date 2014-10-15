@@ -50,7 +50,66 @@ exports.tests = {
         test.ok(swayControl != null);
 
         test.done();
-    } //,
+    },
+    control_constrainValue_min: function (test) {
+        var constraint = {
+            floor: -45,
+            ceiling: 135
+        };
+
+        var testValue = swayControl.constrainValue(35, constraint);
+        test.ok(testValue == 35);
+        testValue = swayControl.constrainValue(-135, constraint);
+        test.ok(testValue == -45);
+
+        test.done();
+    },
+    control_constrainValue_max: function (test) {
+        var constraint = {
+            floor: -45,
+            ceiling: 135
+        };
+
+        var testValue = swayControl.constrainValue(35, constraint);
+        test.ok(testValue == 35);
+        testValue = swayControl.constrainValue(235, constraint);
+        test.ok(testValue == 135);
+
+        test.done();
+    },
+    control_ratioValue: function (test) {
+        var constraint = {
+            floor: -45,
+            ceiling: 135
+        };
+
+        var testRatio = swayControl.ratioValue(35, constraint);
+        console.log(testRatio);
+
+        testRatio = swayControl.ratioValue(135, constraint);
+        console.log(testRatio);
+        testRatio = swayControl.ratioValue(-35, constraint);
+        console.log(testRatio);
+
+        test.done();
+    },
+    control_scaleValue: function (test) {
+        var constraint = {
+            floor: -45,
+            ceiling: 135
+        };
+        var scale = {
+            min: 0,
+            max: 1
+        };
+
+        var testScale = swayControl.scaleValue(35, scale, constraint);
+        console.log(testScale);
+
+        test.done();
+    }
+
+     //,
 
     // Note that these tests below should be fixed, as control debugging should be able to be turned on
 

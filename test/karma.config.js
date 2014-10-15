@@ -21,6 +21,7 @@ module.exports = function(config) {
             {pattern: 'ui/scripts/**/*.js', included: false}
         ],
 
+
         // list of files to exclude
         exclude: ['test/scripts/api/*.js'],
 

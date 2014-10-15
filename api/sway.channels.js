@@ -34,6 +34,7 @@ sway.channelControl = {
     overflowQueue: [],
     channelKeys: [],
     init: function () {
+        sway.balancer.init();
         this.channelKeys = _.keys(this.channels);
         for (var i = 0; i < this.channelKeys.length; i++)
         {
@@ -44,6 +45,7 @@ sway.channelControl = {
     },
     // add a user to the channel queue, and remove from emptyChannels or availableChannels as necessary
     enqueue: function (channel, user) {
+        //console.log("Enqueuing user " + user.uid + " into " + channel.displayName);
         // get size
         var size = channel.queueSize ? channel.queueSize : sway.config.channel.defaultQueueSize;
 
@@ -52,41 +54,68 @@ sway.channelControl = {
             // if size is not unlimited (-1) and we are at capacity
             if (size >= 0 && channel.users.length >= size) {
                 // error, adding to a full queue
-                // TODO: what to do when the queue is full?
-                console.log('All Channels Full');
+                //console.log("Overflowing user " + user.uid);
+                sway.channelControl.overflowQueue.push(user);
+                user.channel = sway.config.overflowQueue;
                 return;
             }
         } else {
             // channel is empty
+            //console.log("resetting users on channel " + channel.displayName);
             if (!(channel.users)) channel.users = [];
         }
         // If we've got a sneaky user trying to hop out of their channel, at the least remove them from the channel they were in
-        if (user.channel) sway.channelControl.remove(user.channel, user);
+        if (user.channel)
+        {
+            //console.log("Removing user " + user.uid + " from " + user.channel.displayName);
+            sway.channelControl.remove(user.channel, user);
+            //console.log("Removed user " + user.uid + " : now " + user.channel);
+        }
         // We're good, add to the queue
         channel.users.push(user);
         // ensure the first user in queue is still active (maybe it's our new user, who cares)
         channel.users[0].active = true;
         user.channel = channel;
+
+        //console.log("User " + user.uid + " enqueued in " + user.channel.displayName);
     },
     // pop & deactivate the next a user from the channel queue, activate the next user in the channel queue
     dequeue: function (channel) {
-        var user = channel.users.shift();
-        user.active = false;
-        user.channel = null;
-        channel.users[0].active = true;
-        // put an overflow member in the queue
-        if (this.overflowQueue.length) channel.users.push(this.overflowQueue.shift());
+        var u = channel.users.shift();
+        u.active = false;
+        u.channel = null;
+        this.enqueueNext(channel);
     },
     // remove a user from within the queue (not the same as dequeue!)
     remove: function (channel, user) {
-        //console.log('Removing')
+        console.log("removing user " + user.uid);
         user.active = false;
         user.channel = null;
         channel.users = _.reject(channel.users, function (u) {
             return u.uid == user.uid;
         });
+        //console.log("Preparing to enqueueNext");
+        this.enqueueNext(channel);
+    },
+    enqueueNext: function (channel) {
         // ensure that if the user was the first one, we set the new one to active (should be picked up by the next poll interval
-        if (channel.users.length) channel.users[0].active = true;
+        if (channel.users.length) {
+
+            var u = channel.users[0];
+            u.active = true;
+            u.channel = channel;
+            //console.log("channel set to " + channel.displayName);
+        } else {
+
+            // if we have an overflow queue, use that
+            if (sway.channelControl.overflowQueue.length) {
+                var u = sway.channelControl.overflowQueue.shift();
+                u.channel = null;
+                this.enqueue(channel, u);
+            } else {
+                //console.log("No users to queue");
+            }
+        }
     },
     // TODO: determine if user is active, and if not, check to see if users are idle
     update: function (user) {
@@ -105,14 +134,14 @@ sway.channelControl = {
     },
     // get next channel from load balancer.
     assign: function (user) {
+        console.log("Beginning Assign");
+        sway.channelControl.debugChannels();
         var channel = this.LoadBalancer.call(sway.balancer);
         // if channel is null, we need to put the user into the overflow queue
         if (channel) {
             this.compact(channel);
             return this.enqueue(channel, user);
         }
-        // console.log("Balancer: " + sway.config.channel.balancer);
-        // console.log("Warning: Channel Overflow");
         this.overflowQueue.push(user);
         return;
     },
@@ -129,6 +158,15 @@ sway.channelControl = {
             return u.expired;
         });
     },
+    debug: true,
+    debugChannels: function () {
+        if (sway.channelControl.debug) {
+            for (var i = 0; i > sway.channelControl.channels.length; i++) {
+                var chan = sway.channelControl.channels[i];
+                console.log(chan.displayName + " has " + chan.users.length + " users");
+            }
+        }
+    },
     // Channel middleware
     middleware: {
         assignChannel: function (req, res, next) {
@@ -138,7 +176,6 @@ sway.channelControl = {
                 // Tell the client to redirect ONLY when we assign a channel
                 if (user.channel.redirect)
                 {
-                    console.log("assigning redirect to req");
                     req.redirect = user.channel.redirect;
                 }
             }
@@ -149,15 +186,16 @@ sway.channelControl = {
 
 // Channel Load Balancing Algorithms
 sway.balancer = {
+    init: function () {
+        this.deck = null;
+        this.channelIndex = 0;
+    },
     channelIndex: 0,
     // rotate around the channel list in order
     roundrobin: function () {
-        //var balancer = sway.channelControl.balancer;
         if (!this.deck) {
             this.deck = _.keys(sway.channelControl.channels);
         }
-        //TODO: Is this using the right channel index?
-        //console.log("Deck: " + JSON.stringify(this.deck) + " Index: " + this.channelIndex);
 
         // TODO: Check to ensure queue has space
         var chan = sway.channelControl.channels[this.deck[this.channelIndex]];

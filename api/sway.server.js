@@ -46,11 +46,22 @@ module.exports = (function () {
         reset: function () {
             sway.users.clear();
         },
+        heartbeat: function (req, res, next) {
+            // TODO: make this do... something?
+            next();
+        },
         expire: function (req, res, next) {
             console.log("Removing user " + req.user.uid + " from channel " + req.user.channel.name);
             sway.channels.remove(req.user.channel, req.user);
             req.message = sway.config.messages.expirationMessage;
             next();
+        },
+        finalizeAdminResponse: function (req, res) {
+            var response = {
+
+            };
+            // return our response
+            res.status(200).json(response);
         },
         // Middleware to complete the response format and send it
         finalizeUserResponse: function (req, res) {
@@ -91,7 +102,6 @@ module.exports = (function () {
             }
             // return our response
             res.status(200).json(response);
-
         },
         updateUserConfig: function (req, res, next) {
             req.config = {

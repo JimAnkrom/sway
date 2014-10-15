@@ -1,58 +1,72 @@
 {
     "Player1": {
-        "address": "192.168.1.202",
-        "port": 6000,
-        "displayName": "Welcome to Channel 1",
-        "description": "This channel is the RED CUBE",
-        "orientation": "/orient/1"
+        "displayName": "Layer 1 Opacity",
+        "description": "This channel controls layer 1's opacity",
+        "plugin": "resolumeMotion",
+        "resolumeMotion": {
+            "address": "192.168.1.245",
+            "port": 6000,
+
+            "orientation": {
+                "alpha": "/layer1/video/opacity/values",
+                "beta": {
+                    "constraints": {
+                        "floor": -25,
+                        "ceiling": 110
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    },
+                    "address": "/layer1/video/opacity/values"
+                },
+                "gamma": {
+                    "constraints": {
+                        "floor": -90,
+                        "ceiling": 90
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    },
+                    "address": "/layer1/video/effect1/opacity/values"
+                }
+            }
+        }
     },
     "Player2": {
-        "address": "192.168.1.202",
-        "port": 6000,
-        "displayName": "Multi-user test channel 2",
-        "description": "This channel is the GREEN CUBE",
-        "orientation": "/orient/2"
-    },
-    "Player3": {
-        "address": "192.168.1.202",
-        "port": 6000,
-        "displayName": "Multi-user test channel 3",
-        "description": "This channel is the PINK CUBE",
-        "orientation": "/orient/3"
-    },
-    "Player4": {
-        "address": "192.168.1.202",
-        "port": 6000,
-        "displayName": "Multi-user test channel 4",
-        "description": "This channel is the BLUE CUBE",
-        "orientation": "/orient/4"
-    },
-    "Player5": {
-        "address": "192.168.1.202",
-        "port": 6000,
-        "displayName": "Welcome to Channel 5",
-        "description": "This channel is the RED CUBE",
-        "orientation": "/orient/5"
-    },
-    "Player6": {
-        "address": "192.168.1.202",
-        "port": 6000,
-        "displayName": "Multi-user test channel 6",
-        "description": "This channel is the GREEN CUBE",
-        "orientation": "/orient/6"
-    },
-    "Player7": {
-        "address": "192.168.1.202",
-        "port": 6000,
-        "displayName": "Multi-user test channel 7",
-        "description": "This channel is the PINK CUBE",
-        "orientation": "/orient/7"
-    },
-    "Player8": {
-        "address": "192.168.1.202",
-        "port": 6000,
-        "displayName": "Multi-user test channel 8",
-        "description": "This channel is the BLUE CUBE",
-        "orientation": "/orient/8"
+        "displayName": "Layer 2 Opacity",
+        "description": "This channel controls layer 2's opacity",
+        "plugin": "resolumeMotion",
+        "resolumeMotion": {
+            "address": "192.168.1.245",
+            "port": 6000,
+
+            "orientation": {
+                "alpha": "/layer2/video/opacity/values",
+                "beta": {
+                    "constraints": {
+                        "floor": -25,
+                        "ceiling": 110
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    },
+                    "address": "/layer2/video/opacity/values"
+                },
+                "gamma": {
+                    "constraints": {
+                        "floor": -90,
+                        "ceiling": 90
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    },
+                    "address": "/layer2/video/effect1/opacity/values"
+                }
+            }
+        }
     }
 }

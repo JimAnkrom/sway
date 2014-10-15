@@ -39,6 +39,7 @@ sway.monitor = {
             // if we're over maxSamples, drop one.
             if (this.samples.length >= cfg.maxSamples) this.samples.shift();
             this.currentFrame.setAverage();
+            this.currentFrame.memoryUsage = process.memoryUsage();
             this.samples.push(this.currentFrame);
             if (this.onSampling != null) this.onSampling.call(this, this.currentFrame);
             // Use sampleTime as id for new sample.
@@ -59,8 +60,9 @@ sway.monitor.Sample = function (id, stamp) {
     this.intervalSum = 0;
     this.intervals = [];
     this.durations = [];
-
+    this.memoryUsage = process.memoryUsage();
 };
+
 // encapsulates the setAverage logic; it's simple, but don't want it hanging around for someone to modify for no good reason
 sway.monitor.Sample.prototype.setAverage = function () {
     var count;

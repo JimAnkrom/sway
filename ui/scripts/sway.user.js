@@ -3,11 +3,21 @@
  *
  * sway.user is the library which will control client authorization, establish server connections
  *
- * It requires the existence of global a config variable 'sway', which must have a value 'controlUrl'
+ * It requires the existence of global a config variable 'sway'
  */
 var sway = sway || {};
+
 // default config. Note that these values can be overwritten at any time by a message from sway
 sway.hostname = "http://sway.videobleep.tv";
+sway.debugPanel = null;
+sway.outputPanel = null;
+sway.alertCount = 0;
+
+/**
+ *
+ * sway.config
+ *
+ */
 sway.config = {
     "debug": "verbose",
     "url": 'http://192.168.1.250:1000',
@@ -16,19 +26,23 @@ sway.config = {
         "maxAlerts": 10
     },
     "user": {
+        heartbeatInterval: 250,
         // interval, in milliseconds, that motion control messages are sent
         controlInterval: 50,
         // time, in milliseconds, before an idle user times out
         idleTimeout: 10000
     },
     "api": {
+        "heartbeat": "/pulse",
         "users": "/users",
         "control": "/control",
         "osc": "/osc",
-        "deleteUser": "/delete"
+        "deleteUser": "/delete",
+        "monitor": "/monitor"
     },
     update: function (config)  {
         if (!config) return;
+        if (config.heartbeatInterval) sway.config.user.heartbeatInterval = config.heartbeatInterval;
         if (config.idleTimeout) sway.config.user.idleTimeout = config.idleTimeout;
         if (config.controlInterval) sway.config.user.controlInterval = config.controlInterval;
         if (config.serverUrl) sway.config.url = config.serverUrl;
@@ -36,13 +50,18 @@ sway.config = {
     }
 };
 
-sway.oninitialized = function () {
-    // initialize plugins here or override this
-    sway.motion.init();
+sway.plugins = {
+    getList: function () {
+        if (sway.plugins.list == null)
+        { sway.plugins.list = []; }
+        return sway.plugins.list;
+    },
+    register: function (plugin) {
+        this.getList().push(plugin);
+        plugin.init.call(plugin);
+    }
 };
-sway.debugPanel = null;
-sway.outputPanel = null;
-sway.alertCount = 0;
+
 sway.templates = {
     dataRow: function (label, value) {
         return '<tr><td>' + label + '</td><td>' + value + '</td></tr>';
@@ -51,10 +70,24 @@ sway.templates = {
         return '<div>' + message + '</div>';
     }
 };
+
+
+/**
+ *
+ * Sway bootstrapping
+ *
+ */
+sway.oninitialized = function () {
+    // initialize plugins here or override this
+    sway.motion.init();
+};
+
 sway.init = function () {
-    if (window.location.origin != sway.hostname) {
-        window.location.href = sway.hostname;
-        return;
+    if (sway.hostname) {
+        if (window.location.origin != sway.hostname) {
+            window.location.href = sway.hostname;
+            return;
+        }
     }
     if (!(sway.config.url)) return sway.debug('sway.config.url is not set!');
     sway.user.authorize();
@@ -62,38 +95,41 @@ sway.init = function () {
     sway.outputPanel = document.createElement('div');
     document.body.appendChild(sway.outputPanel);
 };
-sway.debug = function (message) {
-    if (console && console.log) {
-        console.log(message)
-    } else {
-        sway.alert(message);
-    }
-};
-sway.alert = function (message) {
-    if (message.isArray && message.isArray()) {
-        for (var i=0; i < message.length; i++)
-        {
-            sway.addMessage(message);
-        }
-    }
-    else
-        sway.addMessage(message);
-};
-sway.addMessage = function (message){
-    sway.alertCount++;
-    if (sway.alertCount > sway.config.ui.maxAlerts) return;
-    var p = document.createElement('p');
-    var t = document.createTextNode(message);
-    p.appendChild(t);
-    sway.outputPanel.appendChild(p);
 
-};
+
+
+
+
+
+
+
 
 // Sway User Module
 sway.user = {
     token: {},
     channel: {},
     user: {},
+    setHeartbeat: function () {
+        // set a value to compare to in setInterval closure
+        var timestamp = Date.now();
+
+        sway.user.idleTimestamp = timestamp;
+
+        // Set up a heartbeat to ensure that if we're in an idle queue we still can get a channel update.
+        if (!sway.heartbeat) {
+            sway.heartbeat = window.setInterval(function () {
+                // if there has been no change in the timestamp, we are idle
+                var isIdle = (sway.user.idleTimestamp == timestamp);
+
+                if (sway.motion.idle(isIdle)) {
+                    window.clearInterval(sway.poll);
+                    return;
+                }
+
+                sway.api.post( sway.config.url + sway.config.api.heartbeat, {}, {});
+            }, sway.config.user.heartbeatInterval);
+        }
+    },
     authorize: function (callback) {
         // post to url/users
         sway.api.post(sway.config.url + "/users", sway.user.user, {
@@ -110,16 +146,29 @@ sway.user = {
     }
 };
 
+sway.sockets = {
+    init: function () {
+        sway.sockets.socket = io.connect(sway.config.socketAddress);
+        socket.on('user-update', sway.sockets.handleUpdate);
+    },
+    // handle updates from the server
+    handleUpdate: function (data) {},
+    emit: function () {}
+};
+
 // Sway API calls and utilities
 sway.api = {
     // Handles standard Sway Server return messages (non-request specific)
     processResponse: function (data) {
+        sway.config.update(data.config);
+        //console.log(JSON.stringify(data.token));
         if (data.user) sway.user.user = data.user;
         if (data.token) sway.user.token = data.token;
-        if (data.channel) sway.user.channel = data.channel;
+        if (data.channel) {
+            sway.user.channel = data.channel;
+            sway.config.channel = data.channel;
+        }
         if (data.messages) sway.alert(data.messages);
-
-        sway.config.update(data.config);
         if (data.redirect) {
             document.location.href = data.redirect;
         }
@@ -165,19 +214,20 @@ sway.api = {
                         sway.api.processResponse(response);
                         if (options.success) {
                             options.success(http, response);
+
                         }
                     }
                     else {
-                        sway.alert('Error: Response status ' + http.status + ' returned for ' + http.url);
+                        sway.alert('Error: Response status ' + http.status + ' returned for ' + http.url + ' URL: ' + url);
                         if (options.error) {
                             options.error(http, http.response);
                         }
-                        sway.debug('Error: Response status ' + http.status + ' returned for ' + http.url);
+                        sway.debug('Error: Response status ' + http.status + ' returned for ' + http.url + ' URL: ' + url);
                     }
                 }
             };
             var message = JSON.stringify(params);
-
+            //console.log(url);
             http.open(verb, url, true);
             http.setRequestHeader('Accept','*/*');
             http.setRequestHeader('Content-Type', 'application/json');
@@ -190,6 +240,34 @@ sway.api = {
         // because IE5&6 needs to go away
         return sway.debug('You are using a browser that does not support required technology for Sway!');
     }
+};
+
+sway.debug = function (message) {
+    if (console && console.log) {
+        console.log(message)
+    } else {
+        sway.alert(message);
+    }
+};
+
+sway.alert = function (message) {
+    if (message.isArray && message.isArray()) {
+        for (var i=0; i < message.length; i++)
+        {
+            sway.addMessage(message);
+        }
+    }
+    else
+        sway.addMessage(message);
+};
+
+sway.addMessage = function (message){
+    sway.alertCount++;
+    if (sway.alertCount > sway.config.ui.maxAlerts) return;
+    var p = document.createElement('p');
+    var t = document.createTextNode(message);
+    p.appendChild(t);
+    sway.outputPanel.appendChild(p);
 };
 
 sway.renderDebugEvent = function (panel, e) {
@@ -209,7 +287,12 @@ sway.renderDebugEvent = function (panel, e) {
         output += t.dataRow('Channel', sway.user.channel.display || sway.user.channel.name);
         output += t.dataRow('Description', sway.user.channel.description);
     }
+    if (c.compassHeading) {
+        output += t.dataRow('Compass', c.compassHeading);
+
+    }
     if (o) {
+        output += t.dataRow('Corrected', c.correctAlpha);
         output +=
             t.dataRow('absolute', o.absolute)
             + t.dataRow('alpha', o.alpha)

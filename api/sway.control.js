@@ -24,6 +24,77 @@ module.exports = (function (){
             this.processMotion(channel, control, 'rotation');
             this.processMotion(channel, control, 'orientation');
             this.processLocation(channel, control, 'location');
+            this.processPlugin(channel, control, 'resolumeMotion');
+        },
+        // Custom routing plugin for resolumeMotion
+        processPlugin: function (channel, control, pluginName) {
+            var pluginDef = channel[pluginName];
+            var controlName = 'orientation';
+
+            if (pluginDef) {
+                var controlRoute = pluginDef[controlName];
+                var cInput = control[controlName];
+                // config.server.port, config.server.address
+                var ip = cInput.address || pluginDef.address || sway.config.server.address;
+                var port = cInput.port || pluginDef.port || sway.config.server.port;
+
+                if (controlRoute && cInput) {
+                    if (controlRoute.alpha || controlRoute.beta || controlRoute.gamma) {
+
+                        // Currently - Yaw, Pitch, Roll (alpha, beta, gamma)
+                        if (controlRoute.alpha)
+                            sway.osc.sendToAddress(ip, port, controlRoute.alpha, cInput.alpha)
+
+                        if (controlRoute.beta) {
+                            var beta = sway.server.processValue(ip, port, cInput.beta, controlRoute.beta);
+                        }
+                        if (controlRoute.gamma) {
+                            var gamma = sway.server.processValue(ip, port, cInput.gamma, controlRoute.gamma);
+                        }
+                    } else {
+                            // Currently - Yaw, Pitch, Roll (alpha, beta, gamma)
+                            sway.osc.sendToAddress(ip, port, cRoute, cInput.alpha, cInput.beta, cInput.gamma);
+                    }
+                }
+            }
+        },
+        processValue: function (ip, port, value, valueDefinition) {
+            var def = valueDefinition;
+            var address = def;
+            if (def.constraints || def.scale) {
+                address = def.address;
+                value = sway.server.scaleValue(value, def.scale, def.constraints);
+            }
+
+            sway.osc.sendToAddress(ip, port, address, value);
+        },
+        scaleValue: function (value, scale, constraints) {
+            if (constraints) {
+                var constrainedValue = sway.server.constrainValue(value, constraints);
+                if (scale) {
+                    var ratio = sway.server.ratioValue(constrainedValue, constraints);
+                    var scaleRange = scale.max - scale.min;
+                    var relativeOffset = ratio * scaleRange;
+                    var absoluteValue = relativeOffset + scale.min;
+                    return absoluteValue;
+                }
+            }
+            return value;
+        },
+        // Get the ratio of the value to the size of the constraint range
+        ratioValue: function (value, constraints) {
+            if (constraints) {
+                var rangeSize = constraints.ceiling - constraints.floor;
+                var adjustedValue = value - constraints.floor;
+                return adjustedValue / rangeSize;
+            }
+        },
+        constrainValue: function (value, constraints) {
+            if (constraints) {
+                if (value < constraints.floor) return constraints.floor;
+                if (value > constraints.ceiling) return constraints.ceiling;
+            }
+            return value;
         },
         processMotion: function (channel, control, inputType) {
             var cRoute = channel[inputType]

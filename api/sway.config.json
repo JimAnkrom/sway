@@ -9,11 +9,13 @@
         "timeout": 30000
     },
     "api": {
+        "heartbeat": "/pulse",
         "control": "/control",
         "mappedOSC": "/maposc",
         "OSC": "/osc",
         "users": "/users",
-        "deleteUser": "/delete"
+        "deleteUser": "/delete",
+        "monitor": "/monitor"
     },
     "server": {
         "address": "192.168.1.202",
@@ -24,10 +26,15 @@
         "defaultQueueSize": -1
     },
     "user": {
+        "heartbeatInterval": 250,
         "controlInterval": 50,
         "idleTimeout": 10000
     },
     "messages": {
         "expirationMessage": "You have been disconnected due to inactivity. Thank you for playing; we hope you'll visit us again soon!"
+    },
+    "overflowQueue": {
+        "displayName": "You are in the wait queue",
+        "description": "You are waiting for another user to leave"
     }
 }

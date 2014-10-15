@@ -9,13 +9,14 @@ var config = require('./sway.config.json');
 
 module.exports = (function (){
 
-    function Message(address) {
+    function Message(address, offset, values) {
         this.oscType = "message";
         this.address = address;
 
         this.args = [];
-        var items = arguments[1];
-        for (var i=1; i< items.length; i++)
+        var items = values;
+        // offset is... where in the arguments list we're passing in do we start pulling value arguments out of the list
+        for (var i=offset; i< items.length; i++)
         {
             var arg = items[i];
             this.args.push(new Argument(arg));
@@ -44,7 +45,7 @@ module.exports = (function (){
     return {
         socket: null,
         send: function (address) {
-            var message = new Message(address, arguments);
+            var message = new Message(address, 1, arguments);
 
             var buffer = oscMin.toBuffer(message);
 
@@ -55,7 +56,9 @@ module.exports = (function (){
         },
         // Not yet working
         sendToAddress: function (ipAddress, port, address) {
-            var message = new Message(address, arguments);
+            // remove ip and port off the arguments...
+
+            var message = new Message(address, 3, arguments);
 
             var buffer = oscMin.toBuffer(message);
 
