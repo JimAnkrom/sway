@@ -7,17 +7,17 @@
  *
  */
 var sway = sway || {};
-sway.data = sway.data || {};
 
 /**
  * Sway.data.transformation - Scale and constrain data to appropriate values
  */
+sway.data = sway.data || {};
 sway.data.transform = {
     // transform a value to given scale, based on its ratio within a constraint range.
     scaleValue: function (value, scale, constraints) {
         // We cannot scale without constraints
         if (!constraints) return value;
-        console.log("here");
+
         var constrainedValue = this.constrainValue(value, constraints);
 
         if (scale) {
@@ -50,9 +50,8 @@ sway.data.transform = {
         }
         return value;
     },
-    // TODO: this needs to get the scale & constraint from whatever level in the config it is at
     transformValues: function (valueHash, config) {
-        var keys = valueHash.keys();
+        var keys = Object.keys(valueHash);
         for (var i=0; i<keys.length; i++) {
             var key = keys[i];
             var keyConfig = config[key];
@@ -85,8 +84,6 @@ sway.input = {
 
     }
 };
-
-
 
 
 /**
@@ -149,6 +146,7 @@ sway.motion = {
             icon.style.zIndex = 100;
             sway.motion.icon = icon;
             document.body.appendChild(sway.motion.icon);
+            // TODO: Installation specific
             icon.src = '/images/videobleepicon.gif';
         }
         // beta - pitch - is -180 upside-down from pointing forward, 180 upsidedown from tilting back (towards user)
@@ -165,15 +163,11 @@ sway.motion = {
     handleOrientationEvent: function (e) {
 //            if (!calibration) {
 //                // This should always be the user pointing towards their desired start point on the screen!
-//                // We may be able to have them point to "the djs" first, or even run a system calibration to establish where the compass heading is.
+//                // We may be able to have them point to "the front" first, or even run a system calibration to establish where the compass heading is.
 //                this.calibration = e;
 //            }
 
         sway.motion.renderIcon(e);
-
-
-        // android - iphone
-        //
 
         var plugin = sway.config.channel.plugin;
         var pluginConfig = sway.config.channel[plugin];

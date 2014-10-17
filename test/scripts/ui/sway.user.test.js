@@ -65,9 +65,7 @@ define(['sinon', 'sway.user'], function (sinon, swayUser) {
                     token: { id: 10, uid: 219024871 },
                     channel: { name: "testChannel1"}
                 };
-                server.respondWith('POST', serverUrl + "/test",
-                    [200, {"Content-Type": "application/json"},
-                        JSON.stringify(authResponse)] );
+                server.respondWith('POST', serverUrl + "/test", [ 200, { "Content-Type": "application/json" }, JSON.stringify(authResponse)] );
             });
             it('returns a response', function () {
                 swayUser.oninitialized = function (data) {};
