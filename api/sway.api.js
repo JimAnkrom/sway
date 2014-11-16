@@ -145,6 +145,23 @@ app.post(config.api.OSC, userRouter);
 // Admin routing
 app.get(config.api.users, adminRouter);
 
-console.log('Starting server on port ' + config.local.port + '...');
-// TODO when configuration changes, the app should be shut down and restarted
-app.listen(config.local.port);
+var port = config.local.port;
+console.log('Starting server on port ' + port + '...');
+var httpServer = app.listen(port);
+
+// When configuration changes, the app should be shut down and restarted
+sway.core.attach('config', { onload: function () {
+    config = sway.core.config;
+    if (port != config.local.port) {
+        if (sway.core.debug) console.log('Closing server on port ' + port);
+        port = config.local.port;
+        try {
+            httpServer.close();
+        }
+        catch(err) {
+            if (sway.core.debug) console.log('Error: Configuration.onload(config): ' + err.message);
+        }
+        app.listen(port);
+        if (sway.core.debug) console.log('Server restarted on port ' + port + '...');
+    }
+}});
