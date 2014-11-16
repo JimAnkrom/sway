@@ -6,7 +6,11 @@
  * - Is the authority on uid generation.
  */
 var _ = require('underscore');
-var config = require('./sway.config.json');
+
+var sway = sway || {};
+sway.core = require('./sway.core');
+var config = sway.core.config;
+
 var userList = [];
 var idList = [];
 

@@ -5,20 +5,23 @@
  *
  * Sway.Server should manage all tokens and authorization checks
  */
+var debug = false;
+var _ = require('underscore');
 
 var sway = sway || {};
+sway.core = require('./sway.core');
+sway.config = sway.core.config;
 sway.users = require('./sway.users');
 sway.channels = require('./sway.channels');
 sway.control = require('./sway.control');
-sway.config = require('./sway.config.json');
-
-var _ = require('underscore');
+sway.userCookie = 'sway.user';
 
 // TODO: convert this to a 'addHandler' approach instead of just set handler
 sway.users.onExpireUserBatch = function (batch) {
 
 };
 
+// TODO: Is this used anymore?
 sway.authorization = {
     // Auth can be one of the following values:
     queued: 0,
@@ -29,7 +32,6 @@ sway.authorization = {
         return this.control;
     }
 };
-sway.userCookie = 'sway.user';
 
 module.exports = (function () {
     var auth = sway.authLayer;
@@ -70,6 +72,7 @@ module.exports = (function () {
             };
             var chan = req.user.channel || {};
             if (chan.name) {
+
                 response.channel = {
                     name: chan.name,
                     display: chan.displayName,
@@ -79,6 +82,12 @@ module.exports = (function () {
                     url: chan.url,
                     ip: chan.ip
                 };
+
+                if (chan.plugin) {
+                    response.channel.plugin = chan.plugin;
+                    var channelPlugin = chan[chan.plugin];
+                    response.channel[chan.plugin] = channelPlugin;
+                }
             }
             // add user messages
             swayServer.addMessages(req.user.message, response);
@@ -97,7 +106,7 @@ module.exports = (function () {
 
             //Add redirects if necessary
             if (req.redirect) {
-                console.log('Redirect: ' + req.redirect);
+                //console.log('Redirect: ' + req.redirect);
                 response.redirect = req.redirect;
             }
             // return our response
@@ -131,10 +140,12 @@ module.exports = (function () {
             res.end();
         },
         control: function (req, res, next) {
+            if (debug) console.log('Server.control');
             var body = req.body;
             if (req.user) {
                 var channel = req.user.channel;
                 if (channel && body.control) {
+
                     sway.control.control(channel, body.control);
                 }
             }

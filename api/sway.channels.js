@@ -25,12 +25,20 @@
 // TODO: copy good channel information to the user when it changes
 
 var _ = require('underscore');
-
 var sway = sway || {};
-sway.config = require('./sway.config.json');
+sway.core = require('./sway.core');
+sway.config = sway.core.config;
+sway.channels = sway.core.channels;
 
 sway.channelControl = {
-    channels: require('./sway.channels.json'),
+    // events
+    onEnqueue: null,
+    onDequeue: null,
+    onRemove: null,
+    onAssign: null,
+    onReassign: null,
+
+    channels: sway.channels,
     overflowQueue: [],
     channelKeys: [],
     init: function () {
@@ -76,7 +84,7 @@ sway.channelControl = {
         // ensure the first user in queue is still active (maybe it's our new user, who cares)
         channel.users[0].active = true;
         user.channel = channel;
-
+        if (this.onEnqueue) this.onEnqueue(user, channel);
         //console.log("User " + user.uid + " enqueued in " + user.channel.displayName);
     },
     // pop & deactivate the next a user from the channel queue, activate the next user in the channel queue
@@ -84,11 +92,13 @@ sway.channelControl = {
         var u = channel.users.shift();
         u.active = false;
         u.channel = null;
+        if (this.onDequeue) this.onDequeue(u, channel);
         this.enqueueNext(channel);
     },
+    // TODO: Be more explicit what the difference is with dequeue
     // remove a user from within the queue (not the same as dequeue!)
     remove: function (channel, user) {
-        console.log("removing user " + user.uid);
+        //console.log("removing user " + user.uid);
         user.active = false;
         user.channel = null;
         channel.users = _.reject(channel.users, function (u) {
@@ -134,7 +144,7 @@ sway.channelControl = {
     },
     // get next channel from load balancer.
     assign: function (user) {
-        console.log("Beginning Assign");
+        //console.log("Beginning Assign");
         sway.channelControl.debugChannels();
         var channel = this.LoadBalancer.call(sway.balancer);
         // if channel is null, we need to put the user into the overflow queue
@@ -152,6 +162,7 @@ sway.channelControl = {
         // Tell the client to redirect ONLY when we assign a channel
         return;
     },
+    // TODO: How much does this matter if we only have single-user channels?
     // Remove all users with expire = true
     compact: function (channel) {
         channel.users = _.reject(channel.users, function (u) {

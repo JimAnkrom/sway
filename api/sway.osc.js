@@ -4,8 +4,11 @@
 
 var oscMin = require('osc-min');
 var udp = require('dgram');
-var config = require('./sway.config.json');
 
+var sway = sway || {};
+sway.core = require('./sway.core');
+sway.debug = sway.core.debug;
+sway.config = sway.core.config;
 
 module.exports = (function (){
 
@@ -49,7 +52,7 @@ module.exports = (function (){
 
             var buffer = oscMin.toBuffer(message);
 
-            this.socket.send(buffer, 0, buffer.length, config.server.port, config.server.address, function (err, bytes) {
+            this.socket.send(buffer, 0, buffer.length, sway.config.server.port, sway.config.server.address, function (err, bytes) {
                 if (err) { console.log('Error: ' + JSON.stringify(err)); }
 
             });
@@ -57,6 +60,7 @@ module.exports = (function (){
         // Not yet working
         sendToAddress: function (ipAddress, port, address) {
             // remove ip and port off the arguments...
+            if (sway.debug) console.log(ipAddress + ' / ' + port + ' Sending to ' + address + " " + JSON.stringify(arguments[3]));
 
             var message = new Message(address, 3, arguments);
 

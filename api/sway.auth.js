@@ -8,6 +8,7 @@ var sway = sway || {};
 sway.users = require('./sway.users');
 sway.channels = require('./sway.channels.js');
 sway.userCookie = 'swayuser';
+
 module.exports = {
     // Authenticate should validate and retrieve the user
     "authenticate": function (req, res, next) {

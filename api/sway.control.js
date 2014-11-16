@@ -2,7 +2,8 @@
  * Created by Jim Ankrom on 8/14/2014.
  */
 var sway = sway || {};
-sway.config = require('./sway.config.json');
+sway.core = require('./sway.core');
+sway.config = sway.core.config;
 sway.osc = require('./sway.osc');
 sway.osc.open();
 
@@ -21,6 +22,7 @@ module.exports = (function (){
         },
         control: function (channel, control) {
             // we only care about the channel configuration, so use that
+            //console.log("control message!");
             this.processMotion(channel, control, 'rotation');
             this.processMotion(channel, control, 'orientation');
             this.processLocation(channel, control, 'location');
@@ -40,16 +42,17 @@ module.exports = (function (){
 
                 if (controlRoute && cInput) {
                     if (controlRoute.alpha || controlRoute.beta || controlRoute.gamma) {
-
                         // Currently - Yaw, Pitch, Roll (alpha, beta, gamma)
                         if (controlRoute.alpha)
                             sway.osc.sendToAddress(ip, port, controlRoute.alpha, cInput.alpha)
 
                         if (controlRoute.beta) {
                             var beta = sway.server.processValue(ip, port, cInput.beta, controlRoute.beta);
+                            //console.log("Beta: " + cInput.beta);
                         }
                         if (controlRoute.gamma) {
                             var gamma = sway.server.processValue(ip, port, cInput.gamma, controlRoute.gamma);
+                            //console.log("Gamma: " + cInput.gamma);
                         }
                     } else {
                             // Currently - Yaw, Pitch, Roll (alpha, beta, gamma)
@@ -63,7 +66,8 @@ module.exports = (function (){
             var address = def;
             if (def.constraints || def.scale) {
                 address = def.address;
-                value = sway.server.scaleValue(value, def.scale, def.constraints);
+                // don't need to do this here anymore, since moved to the UI
+                //value = sway.server.scaleValue(value, def.scale, def.constraints);
             }
 
             sway.osc.sendToAddress(ip, port, address, value);

@@ -18,7 +18,7 @@
         "monitor": "/monitor"
     },
     "server": {
-        "address": "192.168.1.202",
+        "address": "127.0.0.1",
         "port": "6000"
     },
     "channel": {

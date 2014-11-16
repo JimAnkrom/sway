@@ -2,7 +2,7 @@
  * Created by Jim Ankrom on 9/10/2014.
  */
 var swayChannels = require('../../../api/sway.channels.js');
-var swayConfig = require('../../../api/sway.config.json');
+var swayConfig = require('../.././default/sway.config.json');
 var testChannels = {
     "TESTCHANNEL": {
         "address": "192.168.1.202",

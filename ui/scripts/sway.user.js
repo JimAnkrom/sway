@@ -4,6 +4,14 @@
  * sway.user is the library which will control client authorization, establish server connections
  *
  * It requires the existence of global a config variable 'sway'
+ *
+ * sway.config
+ * sway.templates
+ * sway.plugins
+ * sway.user
+ * sway.api
+ * sway.sockets
+ *
  */
 var sway = sway || {};
 
@@ -71,7 +79,6 @@ sway.templates = {
     }
 };
 
-
 /**
  *
  * Sway bootstrapping
@@ -83,26 +90,20 @@ sway.oninitialized = function () {
 };
 
 sway.init = function () {
+
     if (sway.hostname) {
         if (window.location.origin != sway.hostname) {
             window.location.href = sway.hostname;
             return;
         }
     }
+
     if (!(sway.config.url)) return sway.debug('sway.config.url is not set!');
     sway.user.authorize();
 
     sway.outputPanel = document.createElement('div');
     document.body.appendChild(sway.outputPanel);
 };
-
-
-
-
-
-
-
-
 
 // Sway User Module
 sway.user = {
@@ -216,8 +217,7 @@ sway.api = {
                             options.success(http, response);
 
                         }
-                    }
-                    else {
+                    } else {
                         sway.alert('Error: Response status ' + http.status + ' returned for ' + http.url + ' URL: ' + url);
                         if (options.error) {
                             options.error(http, http.response);

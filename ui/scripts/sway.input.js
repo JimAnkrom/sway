@@ -55,9 +55,13 @@ sway.data.transform = {
         for (var i=0; i<keys.length; i++) {
             var key = keys[i];
             var keyConfig = config[key];
-            var scaleConfig = keyConfig.scale || config.scale;
-            var constraintsConfig = keyConfig.constraints || config.constraints;
-            valueHash[key] = this.scaleValue(valueHash[key], scaleConfig, constraintsConfig);
+            if (keyConfig) {
+                var scaleConfig = keyConfig.scale || config.scale;
+                var constraintsConfig = keyConfig.constraints || config.constraints;
+                valueHash[key] = this.scaleValue(valueHash[key], scaleConfig, constraintsConfig);
+            } else {
+                //alert("Key not found: " + key);
+            }
         }
     }
 };
@@ -172,8 +176,11 @@ sway.motion = {
         var plugin = sway.config.channel.plugin;
         var pluginConfig = sway.config.channel[plugin];
 
+        //alert(sway.config.channel.plugin);
+
         // if we don't have orientation in the plugin, do nothing
         if (pluginConfig && pluginConfig.orientation) {
+
             // Fix for #49, prefer webkitCompassHeading if available.
             var correctAlpha = e.alpha;
             if (!e.absolute) correctAlpha = e.webkitCompassHeading;
@@ -196,19 +203,25 @@ sway.motion = {
             var timestamp = Date.now();
             sway.motion.timestamp = timestamp;
 
-            // transform the values
-            sway.data.transform.transformValues(o, pluginConfig.orientation);
             sway.motion.current = { control: { orientation: o}};
 
             // Set the throttle for input
             if (!sway.poll) {
                 sway.poll = window.setInterval(function () {
+                    //TODO: If the channel changes, we should kill the interval and reset it.
+
                     // if there has been no change in the timestamp, we are idle
                     var isIdle = (sway.motion.timestamp == timestamp);
                     if (sway.motion.idle(isIdle)) {
                         window.clearInterval(sway.poll);
                         return;
                     }
+
+                    // transform the values only when we want to send them to the server
+                    //if (!pluginConfig.orientation.gamma)
+                    //alert(JSON.stringify(pluginConfig.orientation));
+                    sway.data.transform.transformValues(sway.motion.current.control.orientation, pluginConfig.orientation);
+
                     sway.api.post(sway.config.url + sway.config.api.control, sway.motion.current, {});
                 }, sway.config.user.controlInterval);
             }

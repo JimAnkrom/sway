@@ -2,23 +2,27 @@
  * Created by Jim Ankrom on 8/13/2014.
  * - RESTful API for Sway Server
  */
-var debug = false;
-var fs = require('fs');
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-//var server = require('http').Server(app);
-// TODO : Add socket.io support
-//var sockets = require('socket.io')(server);
-var swayServer = require('./sway.server');
-var swayMonitor = require('./sway.monitor');
-var swayAuth = require('./sway.auth');
-var config = require('./sway.config.json');
-// allow passing in port as an override
-var port = parseInt(process.argv[2], 10) || config.local.port;
-var userPage = 'user.html';
 
+// Sway Application Code
+var sway = sway || {};
+sway.core = require('./sway.core');
+var config = sway.core.config,
+    swayServer = require('./sway.server'),
+    swayMonitor = require('./sway.monitor'),
+    swayAuth = require('./sway.auth'),
+    plugins = require('./sway.plugins'),
+    express = require('express'),
+    bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser');
+
+// TODO : Add socket.io support
+//var server = require('http').Server(app);
+//var sockets = require('socket.io')(server);
+
+// TODO: Move to a plugin initialization
+plugins.resolumeMotion.init();
+
+// Set all Access-Control headers for CORS OPTIONS preflight
 function accessControlOptions (req, res, next) {
     res.header('Access-Control-Allow-Origin', req.headers.origin || "*");
     res.header('Access-Control-Allow-Credentials', true);
@@ -34,33 +38,19 @@ function accessControlOptions (req, res, next) {
     }
 }
 
-function logHeaders (req, res, next) {
-    console.log(req.headers);
-    next();
-}
-
 // TODO : improve logging
+//function logHeaders (req, res, next) {
+//    console.log(req.headers);
+//    next();
+//}
 //if (debug) app.use(logHeaders);
 
 // TODO: Report back on monitor timing
-//swayMonitor.onSampling = function (frame) {
+//if (sway.core.debug) swayMonitor.onSampling = function (frame) {
 //    console.log("Int: " + JSON.stringify(frame.intervals));
 //    console.log("Dur: " + JSON.stringify(frame.durations));
 //};
 
-app.use(accessControlOptions);
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json({ type: '*/json' }));
-app.use(bodyParser.json({ type: 'text/plain' }));
-
-// For all requests...
-app.all('*', function(req, res, next) {
-    // TODO: Include this instrumentation
-    //swayMonitor.takeSample.call(swayMonitor);
-    res.set('Content-Type', 'application/json');
-    next();
-});
 
 // Sway Middleware
 function createUser (req, res, next) {
@@ -78,7 +68,21 @@ function getMonitor (req, res) {
 
 
 /* **********************  Router Config  ********************** */
+// Configure express app
+var app = express();
+app.use(accessControlOptions);
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ type: '*/json' }));
+app.use(bodyParser.json({ type: 'text/plain' }));
 
+// For all requests...
+app.all('*', function(req, res, next) {
+    // TODO: Include this instrumentation
+    if (monitor) swayMonitor.takeSample.call(swayMonitor);
+    res.set('Content-Type', 'application/json');
+    next();
+});
 
 // Create user router - must bypass auth routines
 var createRouter = express.Router();
@@ -118,7 +122,7 @@ userRouter.use(swayServer.finalizeUserResponse);
 var adminRouter = express.Router();
 //adminRouter.use(swayAuth.authAdmin);
 // get monitor
-adminRouter.get(config.api.monitor, getMonitor);
+//adminRouter.get(config.api.monitor, getMonitor);
 // list users
 adminRouter.get(config.api.users, swayServer.findAll);
 // get user
@@ -131,10 +135,9 @@ adminRouter.get(config.api.users, swayServer.findAll);
 //app.get('/debug', control.debug);
 adminRouter.use(swayServer.finalizeAdminResponse);
 
-
-app.get(config.api.monitor, adminRouter);
+//app.get(config.api.monitor, adminRouter);
 // Wire the user router to api calls
-app.post(config.api.heartbeat, userRouter);
+//app.post(config.api.heartbeat, userRouter);
 app.post(config.api.deleteUser, userRouter);
 app.post(config.api.control, userRouter);
 app.post(config.api.mappedOSC, userRouter);
@@ -142,8 +145,6 @@ app.post(config.api.OSC, userRouter);
 // Admin routing
 app.get(config.api.users, adminRouter);
 
-
-console.log('Starting server on port ' + port + '...');
-app.listen(port);
-
-console.log('Server started, listening on port ' + port + '...');
+console.log('Starting server on port ' + config.local.port + '...');
+// TODO when configuration changes, the app should be shut down and restarted
+app.listen(config.local.port);

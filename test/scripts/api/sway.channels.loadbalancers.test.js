@@ -1,6 +1,7 @@
 /**
  * Created by Jim Ankrom on 9/10/2014.
  */
+
 var swayChannels = require('../../../api/sway.channels.js');
 
 var testChannels = {
@@ -34,6 +35,7 @@ exports.tests = {
     //Channels_Init: function (test) {},
 
     LoadBalancer_GetChannel: function (test) {
+
 
         test.done();
     }
