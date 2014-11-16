@@ -91,14 +91,16 @@ function Configuration () {
 var core = new Configuration();
 core.debug = true; // default to true, overwrite with config
 // attach environment onload (must be done before initial load
-core.attach('environment', { onload: function (configName, config) {
-    core.debug = config.debug;
-    // load or reload other configurations
-    var envPath = core.environment.path;
-    // load custom configurations from environment folders
-    core.load('config', envPath + 'sway.config.json');
-    core.load('channels', envPath + 'sway.channels.json');
-}});
+core.attach('environment', {
+    onload: function (configName, config) {
+        core.debug = config.debug;
+        // load or reload other configurations
+        var envPath = core.environment.path;
+        // load custom configurations from environment folders
+        core.load('config', envPath + 'sway.config.json');
+        core.load('channels', envPath + 'sway.channels.json');
+    }
+});
 // load environment
 core.load('environment', './sway.env.json');
 

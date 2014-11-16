@@ -7,8 +7,17 @@ var udp = require('dgram');
 
 var sway = sway || {};
 sway.core = require('./sway.core');
-sway.debug = sway.core.debug;
-sway.config = sway.core.config;
+
+function moduleInit () {
+    sway.debug = sway.core.debug;
+    sway.config = sway.core.config;
+}
+moduleInit();
+
+// reload config references on change
+sway.core.attach('config', {
+    onload: moduleInit
+});
 
 module.exports = (function (){
 

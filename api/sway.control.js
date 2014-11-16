@@ -7,6 +7,13 @@ sway.config = sway.core.config;
 sway.osc = require('./sway.osc');
 sway.osc.open();
 
+// reload config references on change
+sway.core.attach('config', {
+    onload: function () {
+        sway.config = sway.core.config;
+    }
+});
+
 module.exports = (function (){
 
     // Sway state management - leave private for now.

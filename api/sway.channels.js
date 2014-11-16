@@ -27,8 +27,11 @@
 var _ = require('underscore');
 var sway = sway || {};
 sway.core = require('./sway.core');
-sway.config = sway.core.config;
-sway.channels = sway.core.channels;
+function moduleInit () {
+    sway.debug = sway.core.debug;
+    sway.config = sway.core.config;
+}
+moduleInit();
 
 sway.channelControl = {
     // events
@@ -256,11 +259,17 @@ sway.balancer = {
     }
 };
 
-// Start up the whole damn mess
-sway.channelControl.init();
+function channelInit() {
+    moduleInit();
+    sway.channelControl.LoadBalancer = sway.balancer[sway.config.channel.balancer];
+    sway.channelControl.init();
+}
 
-// Wire up the LoadBalancer from config
-sway.channelControl.LoadBalancer = sway.balancer[sway.config.channel.balancer];
+channelInit();
+
+// Reload if config changes
+sway.core.attach('channel', { onload: channelInit });
+sway.core.attach('config', { onload: channelInit });
 
 // Module support
 if (module) module.exports = sway.channelControl;

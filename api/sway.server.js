@@ -16,7 +16,14 @@ sway.channels = require('./sway.channels');
 sway.control = require('./sway.control');
 sway.userCookie = 'sway.user';
 
-// TODO: convert this to a 'addHandler' approach instead of just set handler
+// reload config references on change
+sway.core.attach('config', {
+    onload: function () {
+        sway.config = sway.core.config;
+    }
+});
+
+// TODO: convert this to a multicast approach instead of just set handler
 sway.users.onExpireUserBatch = function (batch) {
 
 };

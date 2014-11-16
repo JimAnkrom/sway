@@ -11,6 +11,13 @@ var sway = sway || {};
 sway.core = require('./sway.core');
 var config = sway.core.config;
 
+// reload config references on change
+sway.core.attach('config', {
+    onload: function () {
+        config = sway.core.config;
+    }
+});
+
 var userList = [];
 var idList = [];
 
