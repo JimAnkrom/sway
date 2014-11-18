@@ -3,8 +3,9 @@
  * Configuration manager class featuring config file monitoring, load and reload methods
  */
 
-// Multicast Callback
-function Multicast(callback) {
+// Multicast Callback - refactor out to a utility library
+// TODO Future versions of this should return a function that when called executes the multicast without calling invoke
+function multicast(callback) {
     var self = this,
         multicast = [];
 
@@ -21,8 +22,9 @@ function Multicast(callback) {
         multicast.push(callback);
     }
 
-    this.invoke = invoke;
-    this.add = add;
+    invoke.add = add;
+
+    return invoke;
 }
 
 // Hot-swappable configuration class
@@ -44,9 +46,8 @@ function Configuration () {
             self[configName] = config;
 
             // call onLoad event handler
-            // TODO - include options.onload in the multicast?
             if (options && options.onload) options.onload(configName, config);
-            if (eventHandlers && eventHandlers.onload) eventHandlers.onload.invoke(self, configName, config);
+            if (eventHandlers && eventHandlers.onload) eventHandlers.onload(self, configName, config);
 
             // create reload convenience method
             config.reload = self.load.bind(self, configName, path, options);
@@ -81,7 +82,7 @@ function Configuration () {
             if (handler) {
                 handler.add(options[key]);
             } else {
-                eventHandlers[key] = new Multicast(options[key]);
+                eventHandlers[key] = new multicast(options[key]);
             }
         }
     }

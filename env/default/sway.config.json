@@ -1,6 +1,6 @@
 {
     "ui": {
-        "address": "http://www.videobleep.tv"
+        "address_old": "http://www.videobleep.tv"
     },
     "local": {
         "port": 1000

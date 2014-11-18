@@ -79,7 +79,7 @@ app.use(bodyParser.json({ type: 'text/plain' }));
 // For all requests...
 app.all('*', function(req, res, next) {
     // TODO: Include this instrumentation
-    if (monitor) swayMonitor.takeSample.call(swayMonitor);
+    if (swayMonitor) swayMonitor.takeSample.call(swayMonitor);
     res.set('Content-Type', 'application/json');
     next();
 });

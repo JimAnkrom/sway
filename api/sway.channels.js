@@ -30,6 +30,7 @@ sway.core = require('./sway.core');
 function moduleInit () {
     sway.debug = sway.core.debug;
     sway.config = sway.core.config;
+    sway.channels = sway.core.channels;
 }
 moduleInit();
 

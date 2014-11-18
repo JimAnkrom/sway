@@ -16,7 +16,7 @@
 var sway = sway || {};
 
 // default config. Note that these values can be overwritten at any time by a message from sway
-sway.hostname = "http://sway.videobleep.tv";
+//sway.hostname = "http://sway.videobleep.tv";
 sway.debugPanel = null;
 sway.outputPanel = null;
 sway.alertCount = 0;
@@ -28,7 +28,7 @@ sway.alertCount = 0;
  */
 sway.config = {
     "debug": "verbose",
-    "url": 'http://192.168.1.250:1000',
+    "url": 'http://127.0.0.1:1000',
     "ui": {
         // maximum alert messages allowed
         "maxAlerts": 10

@@ -14,10 +14,10 @@
  - requestMinInterval - what was the shortest time between requests this second
  - requestAverageInterval - what was the average time between requests this second
 
+ // TODO This module should be refactored out to be generic middleware
  *
  *
  */
-
 var sway = sway || {};
 
 sway.monitor = {
