@@ -50,7 +50,8 @@ function Configuration () {
             if (eventHandlers && eventHandlers.onload) eventHandlers.onload(self, configName, config);
 
             // create reload convenience method
-            config.reload = self.load.bind(self, configName, path, options);
+            // TODO Need reload - do NOT ATTACH to the config file! BAD! VERY BAD!
+            // config.reload = self.load.bind(self, configName, path, options);
         }
         catch(err) {
             if (core.debug)

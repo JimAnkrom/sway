@@ -34,11 +34,15 @@ sway.plugins.resolumeMotion = {
         sway.channels.onDequeue = sway.plugins.resolumeMotion.handleOnDequeue;
     },
     handleOnEnqueue: function (user, channel) {
+        // This line fails to get config sometimes
         var config = sway.plugins.getPluginConfig.call(sway.plugins.resolumeMotion, channel);
 
-        if (config.enqueue)
-        // iterate over output plugins and pass them the config
-        sway.plugins.activatePlugins(config.enqueue, sway.plugins.output);
+        if (config && config.enqueue) {
+            // iterate over output plugins and pass them the config
+            sway.plugins.activatePlugins(config.enqueue, sway.plugins.output);
+        } else {
+            if (!config) console.log('handleOnEnqueue failed: no config available for channel ' + channel.name);
+        }
     },
     handleOnDequeue: function (user, channel) {
         var config = sway.plugins.getPluginConfig.call(sway.plugins.resolumeMotion, channel);

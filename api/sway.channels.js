@@ -57,7 +57,7 @@ sway.channelControl = {
     },
     // add a user to the channel queue, and remove from emptyChannels or availableChannels as necessary
     enqueue: function (channel, user) {
-        //console.log("Enqueuing user " + user.uid + " into " + channel.displayName);
+        if (sway.core.debug) console.log("Enqueuing user " + user.uid + " into " + channel.displayName);
         // get size
         var size = channel.queueSize ? channel.queueSize : sway.config.channel.defaultQueueSize;
 
@@ -155,6 +155,8 @@ sway.channelControl = {
         if (channel) {
             this.compact(channel);
             return this.enqueue(channel, user);
+        } else {
+            console.log('sway.channels assign - loadBalancer returned a null channel');
         }
         this.overflowQueue.push(user);
         return;
@@ -213,7 +215,10 @@ sway.balancer = {
         }
 
         // TODO: Check to ensure queue has space
-        var chan = sway.channelControl.channels[this.deck[this.channelIndex]];
+        var key = this.deck[this.channelIndex];
+        var chan = sway.channelControl.channels[key];
+        // if (sway.core.debug)
+            console.log("RoundRobin: Channel Selected - " + chan.name + ' from key ' + key);
         // loop over channels
         if (this.channelIndex+1 == this.deck.length)
             this.channelIndex=0;
