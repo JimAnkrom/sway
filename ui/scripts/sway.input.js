@@ -57,8 +57,9 @@ sway.data.transform = {
             var keyConfig = config[key];
             if (keyConfig) {
                 var scaleConfig = keyConfig.scale || config.scale;
-                var constraintsConfig = keyConfig.constraints || config.constraints;
-                valueHash[key] = this.scaleValue(valueHash[key], scaleConfig, constraintsConfig);
+                var constraintsConfig = keyConfig.constraints || config.constraints || {};
+                var value = valueHash[key] || constraintsConfig.floor || 0; // TODO - create a config value for null?
+                valueHash[key] = this.scaleValue(value, scaleConfig, constraintsConfig);
             } else {
                 //alert("Key not found: " + key);
             }

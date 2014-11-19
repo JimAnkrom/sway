@@ -50,7 +50,7 @@ module.exports = (function (){
                 this.type = 'string';
                 break;
             default:
-                throw new Error("Value is not an expected type!");
+                throw new Error("Value is not an expected type! " + JSON.stringify(arg));
         }
     }
 

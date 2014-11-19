@@ -277,7 +277,6 @@ sway.renderDebugEvent = function (panel, e) {
         m = c.motion,
         r = c.rotation,
         i = c.motionInterval,
-        ic = sway.motion.icon.style,
         p = c.position,
         t = sway.templates;
 
@@ -329,7 +328,8 @@ sway.renderDebugEvent = function (panel, e) {
         + t.dataRow('accuracy', p.coords.heading)
         + t.dataRow('altitude', p.coords.speed);
     }
-    if (ic) {
+    if (sway.motion.icon) {
+        var ic = sway.motion.icon.style;
         output +=
             t.dataRow('Left', ic.left)
             + t.dataRow('Top', ic.top)
