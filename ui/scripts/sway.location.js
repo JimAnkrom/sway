@@ -22,7 +22,7 @@ sway.location = {
         sway.motion.calibration.position = position;
 
         if (sway.debugPanel) {
-            sway.renderDebugEvent.call(sway, sway.debugPanel, e);
+            sway.renderDebugEvent.call(sway, sway.debugPanel, position);
         }
         // position.coords.latitude
         // position.coords.longitude
