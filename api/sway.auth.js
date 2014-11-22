@@ -39,8 +39,8 @@ module.exports = {
             if (!auth.uid) this.setErrorMessage(res, 'Authentication Error: User UID Not Found!');
             else {
                 var user = sway.users.findByUid(auth.uid);
-                user.lastLogin = Date.now();
                 if (user) {
+                    user.lastLogin = Date.now();
                     req.user = user;
                 } else {
                     this.setErrorMessage(res, 'Authentication Error: User Not Found!');

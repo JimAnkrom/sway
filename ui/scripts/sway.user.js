@@ -206,8 +206,12 @@ sway.api = {
                     if (http.status == 200) {
                         var response;
                         if (!http.responseType) {
-                            if (options.responseType == 'json') {
-                                response = JSON.parse(http.responseText);
+                            if (options.responseType == 'json' && http.responseText) {
+                                try {
+                                    response = JSON.parse(http.responseText);
+                                } catch (ex) {
+                                    response = ex;
+                                }
                             } else {
                                 response = http.responseText;
                             }

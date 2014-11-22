@@ -200,9 +200,9 @@ sway.motion = {
                 absolute: e.absolute
             };
 
-            // set a value to compare to in setInterval closure
-            var timestamp = Date.now();
-            sway.motion.timestamp = timestamp;
+            //// set a value to compare to in setInterval closure
+            //var timestamp = Date.now();
+            //sway.motion.timestamp = timestamp;
 
             sway.motion.current = { control: { orientation: o}};
 
@@ -211,13 +211,14 @@ sway.motion = {
                 sway.poll = window.setInterval(function () {
                     //TODO: If the channel changes, we should kill the interval and reset it.
 
-                    // if there has been no change in the timestamp, we are idle
-                    var isIdle = (sway.motion.timestamp == timestamp);
-                    if (sway.motion.idle(isIdle)) {
+                    // idle is when the last motion event is the same as current
+                    // set or unset idle timeout and control interval.
+                    if (sway.motion.idle((sway.motion.last === sway.motion.current))) {
                         window.clearInterval(sway.poll);
                         return;
                     }
-
+                    // for obvious reasons which won't appear obvious later ... this line must come after the check above
+                    sway.motion.last = sway.motion.current;
                     // transform the values only when we want to send them to the server
                     //if (!pluginConfig.orientation.gamma)
                     //alert(JSON.stringify(pluginConfig.orientation));
@@ -242,16 +243,22 @@ sway.motion = {
             sway.renderDebugEvent.call(this, sway.debugPanel, e);
         }
     },
+    // Consider refactoring this out as a throttle class with idle.
     idle: function (isIdle) {
         if (isIdle) {
+            if (console) console.log('Starting Idle Countdown');
             // setTimeout for idle expiration
             sway.idleTimeout = window.setTimeout(function () {
+                if (console) console.log('User is idle, deleting from server.');
                 sway.api.post(sway.config.url + sway.config.api.deleteUser, {}, {});
             }, sway.config.user.idleTimeout);
             return true;
         }
-        // we are no longer idle, let's remove the idle timeout
-        window.clearTimeout(sway.idleTimeout);
+        if (sway.idleTimeout) {
+            // we are no longer idle, let's remove the idle timeout
+            if (console) console.log('User is no longer idle, aborting idle.');
+            window.clearTimeout(sway.idleTimeout);
+        }
         return false;
     }
 };
