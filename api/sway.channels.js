@@ -108,7 +108,7 @@ sway.channelControl = {
         channel.users = _.reject(channel.users, function (u) {
             return u.uid == user.uid;
         });
-        //console.log("Preparing to enqueueNext");
+        if (this.onDequeue) this.onDequeue(u, channel);
         this.enqueueNext(channel);
     },
     enqueueNext: function (channel) {

@@ -34,6 +34,7 @@ sway.plugins.resolumeMotion = {
         sway.channels.onDequeue = sway.plugins.resolumeMotion.handleOnDequeue;
     },
     handleOnEnqueue: function (user, channel) {
+        console.log('OnEnqueue raised');
         // This line fails to get config sometimes
         var config = sway.plugins.getPluginConfig.call(sway.plugins.resolumeMotion, channel);
 
@@ -45,6 +46,7 @@ sway.plugins.resolumeMotion = {
         }
     },
     handleOnDequeue: function (user, channel) {
+        console.log('OnDequeue raised');
         var config = sway.plugins.getPluginConfig.call(sway.plugins.resolumeMotion, channel);
 
         if (config.dequeue)
