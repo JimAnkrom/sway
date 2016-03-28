@@ -5,7 +5,7 @@
  * Tests for the Sway Control component
  */
 
-var swayControl = require('../../../api/sway.control.js');
+var swayControl = require('../.././sway.control.js');
 
 var controlMessage = {
     // orientation

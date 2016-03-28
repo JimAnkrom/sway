@@ -1,0 +1,54 @@
+{
+    "Player1": {
+        "displayName": "Layer 1 Opacity",
+        "description": "This channel controls layer 1's opacity",
+        "plugin": "realtime",
+        "realtime": {
+            "input": {
+                "address": "192.168.1.8",
+                "port": 3000
+            },
+            "output": {
+                "address": "192.168.1.21",
+                "port": 10000,
+                "id": 1,
+                "transform": "vissom",
+                "addressPrefix": "/p1"
+            },
+            "orientation": {
+                "alpha": {
+                    "address": "/posx",
+                    "constraints": {
+                        "floor": -25,
+                        "ceiling": 110
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    }
+                },
+                "beta": {
+                    "address": "/posy",
+                    "constraints": {
+                        "floor": -25,
+                        "ceiling": 110
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    }
+                },
+                "gamma": {
+                    "constraints": {
+                        "floor": -90,
+                        "ceiling": 90
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    }
+                }
+            }
+        }
+    }
+}

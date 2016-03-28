@@ -7,48 +7,46 @@
  */
 var _ = require('underscore');
 
-var sway = sway || {};
-sway.core = require('./sway.core');
-var config = sway.core.config;
+module.exports = function (sway) {
+    var config = sway.core.config;
 
 // reload config references on change
-sway.core.attach('config', {
-    onload: function () {
-        config = sway.core.config;
-    }
-});
+    sway.core.attach('config', {
+        onload: function () {
+            config = sway.core.config;
+        }
+    });
 
-var userList = [];
-var idList = [];
+    var userList = [];
+    var idList = [];
 
-module.exports = (function () {
-
-    var usersService = {
-        onExpireUser: null,
+    var usersService = sway.users = {
+        cookie: 'sway-users',
+        onUserExpired: null,
         onExpireUserBatch: null,
+        onUserCreated: null,
         findAll: function () {
             return userList;
         },
         findById: function (id) {
-            return _.find(userList, function(u){
+            return _.find(userList, function (u) {
                 return u.id == id;
             });
         },
         findByUid: function (uid) {
-            return _.find(userList, function(u){
+            return _.find(userList, function (u) {
                 return u.uid == uid;
             });
         },
-        // Expire / scavenge cache 
+        // Expire / scavenge cache
         expire: function () {
             var newUserList = [];
             var expiredUserBatch = [];
             var timeoutLower = Date.now() - config.users.timeout;
-            for (var i=0; i < userList.length; i++)
-            {
+            for (var i = 0; i < userList.length; i++) {
                 var u = userList[i];
                 if (u.lastLogin && (u.lastLogin < timeoutLower)) {
-                    if (usersService.onExpireUser) usersService.onExpireUser(u);
+                    if (usersService.onUserExpired) usersService.onUserExpired(u);
                     u.expired = true;
                     console.log('Expired user ' + u.uid);
                     expiredUserBatch.push(u);
@@ -72,6 +70,7 @@ module.exports = (function () {
                 options.lastLogin = timeNow;
                 var id = userList.push(options);
                 options.id = id;
+                if (usersService.onUserCreated) usersService.onUserCreated(options);
                 return options;
             } else {
                 // Try again to get a new datetime stamp, since we were lucky in our request and one already exists
@@ -83,7 +82,4 @@ module.exports = (function () {
             idList = [];
         }
     };
-
-    return usersService;
-}());
-
+};

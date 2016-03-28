@@ -1,28 +1,27 @@
 /**
  * Created by Jim Ankrom on 8/14/2014.
  */
-var sway = sway || {};
-sway.core = require('./sway.core');
-sway.config = sway.core.config;
-sway.osc = require('./sway.osc');
-sway.osc.open();
+module.exports = function (sway) {
+
+    require('./sway.osc.js')(sway);
+    sway.osc.open();
 
 // reload config references on change
-sway.core.attach('config', {
-    onload: function () {
-        sway.config = sway.core.config;
-    }
-});
-
-module.exports = (function (){
+    sway.core.attach('config', {
+        onload: function () {
+            sway.config = sway.core.config;
+        }
+    });
 
     // Sway state management - leave private for now.
     sway.state = {
         settings: {}
     };
 
-    // Sway Services
-    sway.server = {
+    // Sway Control
+    // TODO: This WAS sway.server for some reason. Assess that this is correct now
+    sway.control = {
+        // Calibrate the *installation*. This is not calibration for a user.
         calibration: function (data) {
             sway.state.settings.calibration = data;
             //console.log('Calibration Received - ' + JSON.stringify(data));
@@ -62,8 +61,8 @@ module.exports = (function (){
                             //console.log("Gamma: " + cInput.gamma);
                         }
                     } else {
-                            // Currently - Yaw, Pitch, Roll (alpha, beta, gamma)
-                            sway.osc.sendToAddress(ip, port, cRoute, cInput.alpha, cInput.beta, cInput.gamma);
+                        // Currently - Yaw, Pitch, Roll (alpha, beta, gamma)
+                        sway.osc.sendToAddress(ip, port, cRoute, cInput.alpha, cInput.beta, cInput.gamma);
                     }
                 }
             }
@@ -79,6 +78,7 @@ module.exports = (function (){
 
             sway.osc.sendToAddress(ip, port, address, value);
         },
+        // TODO: is this supposed to be in sway.server???
         scaleValue: function (value, scale, constraints) {
             if (constraints) {
                 var constrainedValue = sway.server.constrainValue(value, constraints);
@@ -142,5 +142,4 @@ module.exports = (function (){
         }
     };
 
-    return sway.server;
-}());
+};

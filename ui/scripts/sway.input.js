@@ -8,12 +8,34 @@
  */
 var sway = sway || {};
 
+// eio = engine.io
+var socket = eio('ws://localhost:3500', { "transports": ['websocket']});
+//socket.binaryType = 'blob';
+socket.on('open', function(){
+    socket.on('message', function (data){
+       console.log('Message: ' + data);
+    });
+    socket.on('close', function (){});
+    socket.on('error', function (error) {
+        console.log('Socket Error: ' + error.message);
+    });
+});
+
+// convert yaw, pitch, roll to arraybuffer
+function serializeableControl (yaw, pitch, roll) {
+    return {
+        toString: function () {
+            return 'ypr|' + yaw + '|' + pitch + '|' + roll;
+        }
+    };
+}
+
 /**
  * Sway.data.transformation - Scale and constrain data to appropriate values
  */
 sway.data = sway.data || {};
 sway.data.transform = {
-    // transform a value to given scale, based on its ratio within a constraint range.
+    // realtime a value to given scale, based on its ratio within a constraint range.
     scaleValue: function (value, scale, constraints) {
         // We cannot scale without constraints
         if (!constraints) return value;
@@ -219,12 +241,20 @@ sway.motion = {
                     }
                     // for obvious reasons which won't appear obvious later ... this line must come after the check above
                     sway.motion.last = sway.motion.current;
-                    // transform the values only when we want to send them to the server
+                    // realtime the values only when we want to send them to the server
                     //if (!pluginConfig.orientation.gamma)
                     //alert(JSON.stringify(pluginConfig.orientation));
                     sway.data.transform.transformValues(sway.motion.current.control.orientation, pluginConfig.orientation);
 
-                    sway.api.post(sway.config.url + sway.config.api.control, sway.motion.current, {});
+                    var values = sway.motion.current.control.orientation;
+
+                    if (socket) {
+                        console.log('Values: ' + values.alpha  + ' '  + values.beta + ' ' + values.gamma);
+                        socket.send(serializeableControl(values.alpha, values.beta, values.gamma));
+                    } else {
+                        sway.api.post(sway.config.url + sway.config.api.control, sway.motion.current, {});
+                    }
+
                 }, sway.config.user.controlInterval);
             }
         }
@@ -245,6 +275,7 @@ sway.motion = {
     },
     // Consider refactoring this out as a throttle class with idle.
     idle: function (isIdle) {
+        // Having problems with idle? return false;
         if (isIdle) {
             if (console) console.log('Starting Idle Countdown');
             // setTimeout for idle expiration

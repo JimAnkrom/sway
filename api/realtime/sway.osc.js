@@ -5,22 +5,22 @@
 var oscMin = require('osc-min');
 var udp = require('dgram');
 
-var sway = sway || {};
-sway.core = require('./sway.core');
+// TODO: Perhaps this module should manage the socket entirely...
+module.exports = function (sway) {
 
-function moduleInit () {
-    sway.debug = sway.core.debug;
-    sway.config = sway.core.config;
-}
-moduleInit();
+    function moduleInit() {
+        sway.debug = sway.core.debug;
+        sway.config = sway.core.config;
+    }
 
-// reload config references on change
-sway.core.attach('config', {
-    onload: moduleInit
-});
+    moduleInit();
 
-module.exports = (function (){
+    // reload config references on change
+    sway.core.attach('config', {
+        onload: moduleInit
+    });
 
+    // TODO: Refactor away from constructor, into factory
     function Message(address, offset, values) {
         this.oscType = "message";
         this.address = address;
@@ -54,23 +54,23 @@ module.exports = (function (){
         }
     }
 
-    return {
+    sway.osc = {
         socket: null,
-        send: function (address) {
-            var message = new Message(address, 1, arguments);
-
+        send: function (config, oscAddress) {
+            var message = new Message(oscAddress, 2, arguments);
             var buffer = oscMin.toBuffer(message);
-
-            this.socket.send(buffer, 0, buffer.length, sway.config.server.port, sway.config.server.address, function (err, bytes) {
-                if (err) { console.log('Error: ' + JSON.stringify(err)); }
+            //console.log("Sending to " + config.address + ':' + config.port);
+            // TODO: wrap this so you just send buffer
+            this.socket.send(buffer, 0, buffer.length, config.port, config.address, function (err, bytes) {
+                if (err) { console.log('OSC Socket Error: ' + JSON.stringify(err)); }
 
             });
         },
         // Not yet working
         sendToAddress: function (ipAddress, port, address) {
             // remove ip and port off the arguments...
-            if (sway.debug) console.log(ipAddress + ' / ' + port + ' Sending to ' + address + " " + JSON.stringify(arguments[3]));
-
+            //if (sway.debug) console.log(ipAddress + ' / ' + port + ' Sending to ' + address + " " + JSON.stringify(arguments[3]));
+            console.log(ipAddress + ' / ' + port + ' Sending to ' + address + " " + JSON.stringify(arguments[3]));
             var message = new Message(address, 3, arguments);
 
             var buffer = oscMin.toBuffer(message);
@@ -87,5 +87,4 @@ module.exports = (function (){
             this.socket = udp.createSocket('udp4');
         }
     };
-
-}());
+};

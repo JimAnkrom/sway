@@ -2,8 +2,43 @@
     "Player1": {
         "displayName": "Layer 1 Opacity",
         "description": "This channel controls layer 1's opacity",
-        "plugin": "resolumeMotion",
-        "resolumeMotion": {
+        "plugin": "realtime",
+        "realtime": {
+            "address": "127.0.0.1",
+            "port": 6000,
+
+            "orientation": {
+                "alpha": "/activeclip/video/param14/values",
+                "beta": {
+                    "constraints": {
+                        "floor": -25,
+                        "ceiling": 110
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    },
+                    "address": "/activeclip/video/param15/values"
+                },
+                "gamma": {
+                    "constraints": {
+                        "floor": -90,
+                        "ceiling": 90
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    },
+                    "address": "/activeclip/video/param16/values"
+                }
+            }
+        }
+    },
+    "Player2": {
+        "displayName": "Layer 2 Opacity",
+        "description": "This channel controls layer 2's opacity",
+        "plugin": "realtime",
+        "realtime": {
             "address": "127.0.0.1",
             "port": 6000,
 
@@ -34,4 +69,5 @@
             }
         }
     }
+
 }

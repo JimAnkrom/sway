@@ -194,7 +194,7 @@ sway.api = {
         return sway.api.request(url, 'POST', params, options);
     },
     request: function (url, verb, params, options) {
-        var ooptions = options || {};
+        var options = options || {};
         if (window.XMLHttpRequest) {
             var http = new XMLHttpRequest();
             http.withCredentials = true;

@@ -5,45 +5,42 @@
  *
  * Sway.Server should manage all tokens and authorization checks
  */
+
+
 var debug = false;
 var _ = require('underscore');
 
-var sway = sway || {};
-sway.core = require('./sway.core');
-sway.config = sway.core.config;
-sway.users = require('./sway.users');
-sway.channels = require('./sway.channels');
-sway.control = require('./sway.control');
-sway.userCookie = 'sway.user';
+module.exports = function (sway) {
+    //var auth = sway.authLayer;
 
-// reload config references on change
-sway.core.attach('config', {
-    onload: function () {
-        sway.config = sway.core.config;
-    }
-});
+    require('./sway.middleware.js')(sway);
+    require('./sway.monitor.js')(sway);
+
+    // reload config references on change
+    sway.core.attach('config', {
+        onload: function () {
+            sway.config = sway.core.config;
+        }
+    });
 
 // TODO: convert this to a multicast approach instead of just set handler
-sway.users.onExpireUserBatch = function (batch) {
+    sway.users.onExpireUserBatch = function (batch) {
 
-};
+    };
 
 // TODO: Is this used anymore?
-sway.authorization = {
-    // Auth can be one of the following values:
-    queued: 0,
-    control: 1,
-    calibrate: 10,
-    banned: 666,
-    get: function (uid) {
-        return this.control;
-    }
-};
+//    sway.authorization = {
+//        // Auth can be one of the following values:
+//        queued: 0,
+//        control: 1,
+//        calibrate: 10,
+//        banned: 666,
+//        get: function (uid) {
+//            return this.control;
+//        }
+//    };
 
-module.exports = (function () {
-    var auth = sway.authLayer;
-
-    var swayServer = {
+    var swayServer = sway.server = {
         // Admin Services
         findAll: function (req, res) {
             var users = sway.users.findAll();
@@ -57,17 +54,20 @@ module.exports = (function () {
         },
         heartbeat: function (req, res, next) {
             // TODO: make this do... something?
+            // should renew a user's last used, or something, so we can scavenge for unused space in channels
             next();
         },
+        // Called "expire" because delete is a keyword
         expire: function (req, res, next) {
             console.log("Removing user " + req.user.uid + " from channel " + req.user.channel.name);
-            sway.channels.remove(req.user.channel, req.user);
+            // TODO: used to be 'sway.channels'
+            sway.channelControl.remove(req.user.channel, req.user);
             req.message = sway.config.messages.expirationMessage;
             next();
         },
         finalizeAdminResponse: function (req, res) {
             var response = {
-
+                // TODO: ?? ?? ??
             };
             // return our response
             res.status(200).json(response);
@@ -191,6 +191,4 @@ module.exports = (function () {
 //            });
 //        }
     };
-
-    return swayServer;
-}());
+};

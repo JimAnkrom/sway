@@ -19,7 +19,7 @@ function referenceUser2() {
             "accuracy": 1
         }};
 };
-var users = require('../../../api/sway.users.js');
+var users = require('../../../api/users/sway.users.js');
 
 exports.tests = {
     Users: function (test) {

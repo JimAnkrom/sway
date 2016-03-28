@@ -18,8 +18,8 @@ function referenceUser2() {
         }};
 };
 
-var swayServer = require('../../../api/sway.server.js');
-var swayAuth = require('../../../api/sway.auth.js');
+var swayServer = require('../../../api/users/sway.server.js');
+var swayAuth = require('../../../api/users/sway.auth.js');
 
 // Move to an express mocks library
 function StubResponse() {

@@ -1,20 +1,18 @@
 /**
- * Created by Jim Ankrom on 10/28/2014.
- * Configuration manager class featuring config file monitoring, load and reload methods
+ * Created by Jim Ankrom on 11/30/2014.
  */
 
-// Multicast Callback - refactor out to a utility library
-// TODO Future versions of this should return a function that when called executes the multicast without calling invoke
-function multicast(callback) {
+// Multicast Callback
+// TODO: Deprectate this in favor of toolbox
+function Multicast(callback) {
     var self = this,
         multicast = [];
 
     if (callback) multicast.push(callback);
 
-    function invoke (thisArg) {
-        if (!thisArg) thisArg = self;
+    function invoke () {
         for (var i = 0; i < multicast.length; i++) {
-            multicast[i].apply(thisArg, arguments);
+            multicast[i].apply(self, arguments);
         }
     }
 
@@ -27,8 +25,12 @@ function multicast(callback) {
     return invoke;
 }
 
-// Hot-swappable configuration class
-function Configuration () {
+/*
+    Hot-swappable configuration class.
+    Requires Multicast
+ */
+// TODO: Move this to toolbox
+function Configuration (options) {
     var fs = require('fs'),
         self = this,
         watchers = {},
@@ -54,7 +56,7 @@ function Configuration () {
             // config.reload = self.load.bind(self, configName, path, options);
         }
         catch(err) {
-            if (core.debug)
+            if (options && options.debug)
                 console.log('Error: Configuration.Load(' + configName + '): ' + err.message);
         }
 
@@ -62,7 +64,7 @@ function Configuration () {
             watchers[configName] = fs.watch(path, { persistent: true }, function (event, filename) {
                 if (event == 'change') {
                     self.load(configName, path, options);
-                    if (core.debug) console.log(filename + ' reloaded due to ' + event + ' event on file ' + filename);
+                    if (options && options.debug) console.log(filename + ' reloaded due to ' + event + ' event on file ' + filename);
                 }
             });
         }
@@ -83,28 +85,41 @@ function Configuration () {
             if (handler) {
                 handler.add(options[key]);
             } else {
-                eventHandlers[key] = new multicast(options[key]);
+                eventHandlers[key] = new Multicast(options[key]);
             }
         }
     }
 }
 
-// Load sway configurations
-var core = new Configuration();
-core.debug = true; // default to true, overwrite with config
-// attach environment onload (must be done before initial load
-core.attach('environment', {
-    onload: function (configName, config) {
-        core.debug = config.debug;
-        // load or reload other configurations
-        var envPath = core.environment.path;
-        // load custom configurations from environment folders
-        core.load('config', envPath + 'sway.config.json');
-        core.load('channels', envPath + 'sway.channels.json');
-    }
-});
-// load environment
-core.load('environment', './sway.env.json');
+// TODO: move to toolbox
+// Iterate over each element in array, and execute callback for them
+function each (items, callback, short) {
+    var i, item, len, key, keys, result,
+        objectType = typeof items;
 
-// return the core module
-module.exports = core;
+    if (!items) return;
+
+    if (objectType == "function" || objectType == "object") {
+        isFunction = true;
+        keys = Object.keys(items);
+        len = keys.length;
+    }
+
+    len = len || items.length;
+    for (i = 0; i < len; i++) {
+        key = i;
+        if (keys) key = keys[i];
+        item = items[key];
+        result = callback(item, i, key);
+        if (short && result) return item;
+    }
+}
+
+// Module Support
+
+var utils = {
+    each: each,
+    Multicast: Multicast,
+    Configuration: Configuration
+};
+module.exports = utils;
