@@ -2,10 +2,10 @@
  * Created by Jim Ankrom on 2/21/2016.
  */
 var gulp = require('gulp'),
-    concat = require('gulp-concat'),
-    karma = require('karma').Server,
-    uglify = require('gulp-uglify'),
-    bower = require('gulp-bower');
+    concat = require('gulp-concat');
+    //karma = require('karma').Server,
+    //uglify = require('gulp-uglify'),
+    //bower = require('gulp-bower');
 
 
 // TODO: Create a build task for api
@@ -27,14 +27,19 @@ var gulp = require('gulp'),
  *
  */
 
+gulp.task('copy-deps', function () {
+    return gulp.src([
+        '../toolbox/dist/toolbox.node.js'
+    ])
+        .pipe(gulp.dest('api/lib/'))
+});
 
-
-function getAPISource(gulp) {
-    gulp.src([
-        'api/sway.api.js',
-
-    ]);
-}
+//function getAPISource(gulp) {
+//    gulp.src([
+//        'api/sway.api.js',
+//
+//    ]);
+//}
 
 
 //

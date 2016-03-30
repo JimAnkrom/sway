@@ -61,12 +61,17 @@ function Configuration (options) {
         }
 
         if (!watchers[configName]) {
-            watchers[configName] = fs.watch(path, { persistent: true }, function (event, filename) {
-                if (event == 'change') {
-                    self.load(configName, path, options);
-                    if (options && options.debug) console.log(filename + ' reloaded due to ' + event + ' event on file ' + filename);
-                }
-            });
+            try {
+                watchers[configName] = fs.watch(path, {persistent: true}, function (event, filename) {
+                    if (event == 'change') {
+                        self.load(configName, path, options);
+                        if (options && options.debug) console.log(filename + ' reloaded due to ' + event + ' event on file ' + filename);
+                    }
+                });
+            } catch (err)
+            {
+                if (options && options.debug) console.log('Error: Exception while watching configuration: ' + filename + ' - ' + err.message);
+            }
         }
     };
 

@@ -4,8 +4,9 @@
  * Main entry point for Sway User Services app
  */
 var sway = require('./../core/sway.core.js'),
-    toolbox = require('../../../toolbox/dist/toolbox.node.js');
+    toolbox = require('../lib/toolbox.node.js');
 
+    if (!Object.assign) console.log('Critical Error: Object.assign does not exist! Try a newer version of node.js.');
     if (!toolbox) sway.log('toolbox not found', 'toolbox');
     if (!toolbox.observe) sway.log('observe not found', 'toolbox');
 

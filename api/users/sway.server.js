@@ -91,8 +91,16 @@ module.exports = function (sway) {
                 };
 
                 if (chan.plugin) {
+                    // build the user plugin config
                     response.channel.plugin = chan.plugin;
                     var channelPlugin = chan[chan.plugin];
+
+                    var insConf = sway.core.installation;
+
+                    // Merge installation info into input/output
+                    Object.assign(channelPlugin.input, insConf.input);
+                    Object.assign(channelPlugin.output, insConf.output);
+
                     response.channel[chan.plugin] = channelPlugin;
                 }
             }

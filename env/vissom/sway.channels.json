@@ -5,12 +5,8 @@
         "plugin": "realtime",
         "realtime": {
             "input": {
-                "address": "192.168.1.8",
-                "port": 3000
             },
             "output": {
-                "address": "192.168.1.21",
-                "port": 10000,
                 "id": 1,
                 "transform": "vissom",
                 "addressPrefix": "/p1"
@@ -19,8 +15,8 @@
                 "alpha": {
                     "address": "/posx",
                     "constraints": {
-                        "floor": -25,
-                        "ceiling": 110
+                        "floor": 0,
+                        "ceiling": 360
                     },
                     "scale": {
                         "min": 0,

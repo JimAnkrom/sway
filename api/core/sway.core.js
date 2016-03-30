@@ -34,6 +34,7 @@ var sway = {
             // load custom configurations from environment folders
             core.load('config', envPath + 'sway.config.json');
             core.load('channels', envPath + 'sway.channels.json');
+            core.load('installation', envPath + 'sway.installation.json')
         }
     });
     // load environment configuration
