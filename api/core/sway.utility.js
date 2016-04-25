@@ -3,7 +3,7 @@
  */
 
 // Multicast Callback
-// TODO: Deprectate this in favor of toolbox
+// TODO: Deprecate this in favor of toolbox
 function Multicast(callback) {
     var self = this,
         multicast = [];
@@ -56,8 +56,7 @@ function Configuration (options) {
             // config.reload = self.load.bind(self, configName, path, options);
         }
         catch(err) {
-            if (options && options.debug)
-                console.log('Error: Configuration.Load(' + configName + '): ' + err.message);
+            if (sway.core && sway.core.log) sway.core.log('Error: Configuration.Load(' + configName + '): ' + err.message, 'Configuration');
         }
 
         if (!watchers[configName]) {
@@ -65,12 +64,12 @@ function Configuration (options) {
                 watchers[configName] = fs.watch(path, {persistent: true}, function (event, filename) {
                     if (event == 'change') {
                         self.load(configName, path, options);
-                        if (options && options.debug) console.log(filename + ' reloaded due to ' + event + ' event on file ' + filename);
+                        if (sway.core && sway.core.log) sway.core.log(filename + ' reloaded due to ' + event + ' event on file ' + filename, 'Configuration');
                     }
                 });
             } catch (err)
             {
-                if (options && options.debug) console.log('Error: Exception while watching configuration: ' + filename + ' - ' + err.message);
+                if (sway.core && sway.core.log) sway.core.log('Error: Exception while watching configuration: ' + filename + ' - ' + err.message, 'Configuration');
             }
         }
     };

@@ -1,10 +1,22 @@
 {
     "input": {
-        "address": "192.168.1.8",
+        "address": "192.168.1.10",
         "port": 3000
     },
     "output": {
         "address": "192.168.1.21",
         "port": 10000
-    }
+    },
+    "workflow": {
+        "splash": "calibrate",
+        "calibrate": ["queue", "disco"],
+        "play": ["disco", "quit", "requeue"],
+        "disco": "requeue"
+    },
+    "states": [
+        "splash",
+        "calibrate",
+        "play"
+    ],
+    "initialState": "splash"
 }

@@ -18,7 +18,25 @@ console.log('Starting socket engine at port 3000');
 var server = engine.listen(3000);
 
 var decorator = {
-    onMessage: new utils.Multicast(),
+    onMessage: new utils.Multicast(function (data) {
+        if (!data) return;
+        var values = data.split('|');
+        var chan = values[0];
+        // TODO: look up channel, plugins, etc.
+        if (chan) {
+            var channel = sway.core.channels[chan];
+            var plugin = channel[channel.plugin];
+            // installation port & address need to be added
+            Object.assign(plugin.output, sway.core.installation.output);
+        }
+
+        // TODO: get config from core
+        // TODO: refactor this so that we're calling orientation for orientation
+        // send OSC
+        //vissom.orientation(plugin.output, data.orientation);
+        vissom.orientation(plugin, values[1], values[2], values[3]);
+        sway.log('Message received ' + values[1] + ' ' + values[2], 'realtime');
+    }),
     onPing: new utils.Multicast(),
     onPacket: new utils.Multicast(function (packet) {
         if (packet.type == 'ping') {
@@ -56,37 +74,36 @@ var vissom = {
 };
 
 // TODO: not yet used
-var outputPlugins = {
-    "vissom": {
-        "orientation": vissom.orientation
-    }
-};
+//var outputPlugins = {
+//    "vissom": {
+//        "orientation": vissom.orientation
+//    }
+//};
 // TODO: END REFACTOR TO NEW LIBRARY --------------------------
 
 // Wire up connection event
 server.on('connection', decorator.onConnect);
 
-// debug logging
-if (debug) {
-    decorator.onMessage.add(function (data) {
-        if (!data) return;
-        var values = data.split('|');
-        var chan = values[0];
-        // TODO: look up channel, plugins, etc.
-        if (chan) {
-            var channel = sway.core.channels[chan];
-            var plugin = channel[channel.plugin];
-
-        }
-
-        // TODO: get config from core
-        // TODO: refactor this so that we're calling orientation for orientation
-        // send OSC
-        //vissom.orientation(plugin.output, data.orientation);
-        vissom.orientation(plugin, values[1], values[2], values[3]);
-        console.log('Message received ' + values[1] + ' ' + values[2]);
-    });
-}
+// Add the onMessage handler
+//    decorator.onMessage.add(function (data) {
+//        if (!data) return;
+//        var values = data.split('|');
+//        var chan = values[0];
+//        // TODO: look up channel, plugins, etc.
+//        if (chan) {
+//            var channel = sway.core.channels[chan];
+//            var plugin = channel[channel.plugin];
+//            // installation port & address need to be added
+//            Object.assign(plugin.output, sway.core.installation.output);
+//        }
+//
+//        // TODO: get config from core
+//        // TODO: refactor this so that we're calling orientation for orientation
+//        // send OSC
+//        //vissom.orientation(plugin.output, data.orientation);
+//        vissom.orientation(plugin, values[1], values[2], values[3]);
+//        sway.log('Message received ' + values[1] + ' ' + values[2], 'realtime');
+//    });
 
 // TODO: add message to sway.plugins.output
 

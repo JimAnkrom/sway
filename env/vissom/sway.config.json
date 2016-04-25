@@ -10,6 +10,7 @@
     },
     "api": {
         "heartbeat": "/pulse",
+        "action": "/action",
         "control": "/control",
         "mappedOSC": "/maposc",
         "OSC": "/osc",
@@ -27,7 +28,7 @@
     },
     "channel": {
         "balancer": "roundrobin",
-        "defaultQueueSize": -1
+        "defaultQueueSize": 1
     },
     "user": {
         "heartbeatInterval": 250,

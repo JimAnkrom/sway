@@ -31,7 +31,7 @@ module.exports = function (sway) {
     app.use(bodyParser.json({type: '*/json'}));
     app.use(bodyParser.json({type: 'text/plain'}));
 
-// For all requests...
+    // For all requests...
     app.all('*', sway.monitor.middleware.sample);
 
     /*
@@ -39,6 +39,7 @@ module.exports = function (sway) {
     */
     createRouter.post(config.api.users, sway.auth.createUser);
     createRouter.use(sway.server.updateUserConfig);
+    createRouter.use(sway.workflowController.action);
     createRouter.use(sway.server.finalizeUserResponse);
 // map the create user calls to the createRouter
     app.post(config.api.users, createRouter);
@@ -59,6 +60,8 @@ module.exports = function (sway) {
     userRouter.post(config.api.deleteUser, sway.server.expire);
 // submit control message
     userRouter.post(config.api.control, sway.server.control);
+// submit a user action
+    userRouter.post(config.api.action, sway.workflowController.action);
 // submit mapped osc message
     userRouter.post(config.api.mappedOSC, sway.server.sendMapOsc);
 // submit osc message

@@ -14,18 +14,6 @@ module.exports = function (sway) {
 // need to offer: "change state to xxxx"
 // expose events for state changed
 
-// A workflow has states and transitions
-    function Workflow(options) {
-    }
-
-// A transition has a destination state
-    function Transition(options) {
-    }
-
-// A state has transitions
-    function State(options) {
-    }
-
 
     sway.Queue = (function () {
         function queue_add(item) {
@@ -63,6 +51,78 @@ module.exports = function (sway) {
         return queue;
     })();
 
+
+    sway.workflowController = {
+        // This is called by the client to advance the workflow action to the next step, assuming the requirements are met
+        // there should be some message to indicate a failure to the client
+        action: function (req, res, next) {
+            // req.action ?
+            var that = sway.workflowController,
+                user = req.user,
+                currentState = null,
+                newState;
+
+            // TODO: FOR NOW LET'S JUST ITERATE THROUGH STATES ARRAY - we can get fancy later
+            // FUTURE: create an iterable that knows what actions are in what order, and register that with plugins
+
+            if (!user.state) {
+                // and then set us to the new state
+                newState = that.workflow[sway.core.installation.initialState];
+                req.user.state = {
+                    name: sway.core.installation.initialState,
+                    transitions: newState
+                };
+                next();
+                return;
+            }
+
+            var stateIndex = that.states.findIndex(function (item, index, items) {
+                if (item == user.state.name) {
+                    currentState = that.workflow[item];
+                    return true;
+                }
+            });
+
+            if (!currentState) {
+                sway.log('Error: currentState was null! user: ' + JSON.stringify(user));
+                return;
+            }
+
+            if (req.user.transition) {
+                // validate the transition and deliver the new state
+                // verify that the state name exists in the workflow as a state
+                // if yes, then validate that transition,
+
+                var trans = req.user.transition,
+                    isValid = false;
+                // currentState can be either a string or array
+                if (Array.isArray(currentState)) {
+                    // find the trans in the
+                    isValid = (currentState.indexOf(trans) != -1);
+                } else {
+                    isValid = (currentState == trans);
+                }
+
+                // TODO: validate data from current action here, as needed
+
+                if (isValid) {
+                    // and then set us to the new state
+                    newState = that.workflow[trans];
+                    req.user.state = {
+                        name: trans,
+                        transitions: newState
+                    };
+                }
+                req.user.transition = null;
+            }
+
+            next();
+        },
+        workflow: sway.core.installation.workflow,
+        states: sway.core.installation.states
+        //// TODO: pull this from installation config instead of hardcoded here
+
+    };
 
 // queue controller
 // queue empty event

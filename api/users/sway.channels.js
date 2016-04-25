@@ -56,6 +56,19 @@ module.exports = function (sway) {
                 chan.name = key;
             }
         },
+        // remove all users from all channels
+        clear: function () {
+            // remove wait queue
+            this.overflowQueue = [];
+            // iterate channels and clear
+            _.each(sway.channelControl.channels, function (channel, index, list) {
+                _.each(channel.users, function (user) {
+                    user.active = false;
+                    user.channel = null;
+                });
+                channel.users = null;
+            });
+        },
         // add a user to the channel queue, and remove from emptyChannels or availableChannels as necessary
         enqueue: function (channel, user) {
             if (sway.core.debug) console.log("Enqueuing user " + user.uid + " into " + channel.displayName);
@@ -69,6 +82,7 @@ module.exports = function (sway) {
                     // error, adding to a full queue
                     //console.log("Overflowing user " + user.uid);
                     sway.channelControl.overflowQueue.push(user);
+                    // TODO: This needs to be something more formal than just returning the array
                     user.channel = sway.config.overflowQueue;
                     return;
                 }
@@ -127,7 +141,7 @@ module.exports = function (sway) {
                     u.channel = null;
                     this.enqueue(channel, u);
                 } else {
-                    //console.log("No users to queue");
+                    console.log("No users to queue");
                 }
             }
         },

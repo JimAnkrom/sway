@@ -20,6 +20,8 @@ sway.plugins.realtime.init();
 
 // add sway.server namespace
 require('./sway.server.js')(sway);
+
+if (!sway.workflow) sway.log('Critical Error: Workflow not found!', 'Workflow');
 // TODO: Wire up the sway API
 require('./sway.api.js')(sway);
 

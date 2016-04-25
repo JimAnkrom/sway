@@ -9,12 +9,13 @@ var utils = require('./sway.utility.js');
 var path = require('path');
 
 var sway = {
+    debug: true,
     core: new utils.Configuration({ debug: true }),
     // default debug to true, overwrite with config
     // TODO: refactor log out to toolbox
     log: function (message, moduleName) {
         moduleName = moduleName || 'no module given';
-        if (console) {
+        if (console && sway.debug) {
             console.log('[' + moduleName + '] - ' + message);
         }
     },

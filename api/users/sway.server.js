@@ -13,7 +13,9 @@ var _ = require('underscore');
 module.exports = function (sway) {
     //var auth = sway.authLayer;
 
+    // TODO: all sway references should be handled elsewhere.
     require('./sway.middleware.js')(sway);
+    require('./sway.workflow.js')(sway);
     require('./sway.monitor.js')(sway);
 
     // reload config references on change
@@ -28,18 +30,7 @@ module.exports = function (sway) {
 
     };
 
-// TODO: Is this used anymore?
-//    sway.authorization = {
-//        // Auth can be one of the following values:
-//        queued: 0,
-//        control: 1,
-//        calibrate: 10,
-//        banned: 666,
-//        get: function (uid) {
-//            return this.control;
-//        }
-//    };
-
+    // SwayServer is the general business layer for sway
     var swayServer = sway.server = {
         // Admin Services
         findAll: function (req, res) {
@@ -76,10 +67,15 @@ module.exports = function (sway) {
         finalizeUserResponse: function (req, res) {
             var response = {
                 token: req.token
-            };
-            var chan = req.user.channel || {};
-            if (chan.name) {
+            },
+                chan,
+                config;
 
+            // Add state
+            if (req.user) response.state = req.user.state;
+
+            chan = req.user.channel || {};
+            if (chan.name) {
                 response.channel = {
                     name: chan.name,
                     display: chan.displayName,
@@ -101,9 +97,13 @@ module.exports = function (sway) {
                     Object.assign(channelPlugin.input, insConf.input);
                     Object.assign(channelPlugin.output, insConf.output);
 
+                    // TODO: Copy from an installation-level into orientation et al
+                    // TODO: Need a deep copy for that tho
+
                     response.channel[chan.plugin] = channelPlugin;
                 }
             }
+
             // add user messages
             swayServer.addMessages(req.user.message, response);
             // add system messages
@@ -111,7 +111,7 @@ module.exports = function (sway) {
 
             // in case we want to pass some config back to the user.
             // if it's attached to req.user.config, it means a system update
-            var config = req.user.config;
+            config = req.user.config;
             if (config) {
                 req.user.config = null;
             } else {
@@ -124,6 +124,7 @@ module.exports = function (sway) {
                 //console.log('Redirect: ' + req.redirect);
                 response.redirect = req.redirect;
             }
+
             // return our response
             res.status(200).json(response);
         },
