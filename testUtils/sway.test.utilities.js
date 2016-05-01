@@ -11,7 +11,8 @@ module.exports = {
                     return {
                         json: jsonCallback
                     }
-                }
+                },
+                cookie: function (name, value) {}
             };
         },
         user: function (options) {

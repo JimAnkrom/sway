@@ -12,15 +12,18 @@ var utils = require('./../core/sway.utility.js');
 var engine = require('engine.io');
 
 var sway = require('./../core/sway.core.js');
+require('./sway.control.js')(sway);
+require('./sway.osc.js')(sway);
 //    toolbox = require('../../../toolbox/dist/toolbox.node.js');
-
+sway.osc.open();
 console.log('Starting socket engine at port 3000');
 var server = engine.listen(3000);
 
 var decorator = {
     onMessage: new utils.Multicast(function (data) {
         if (!data) return;
-        var values = data.split('|');
+        var value1,
+            values = data.split('|');
         var chan = values[0];
         // TODO: look up channel, plugins, etc.
         if (chan) {
@@ -30,12 +33,18 @@ var decorator = {
             Object.assign(plugin.output, sway.core.installation.output);
         }
 
-        // TODO: get config from core
-        // TODO: refactor this so that we're calling orientation for orientation
-        // send OSC
-        //vissom.orientation(plugin.output, data.orientation);
-        vissom.orientation(plugin, values[1], values[2], values[3]);
-        sway.log('Message received ' + values[1] + ' ' + values[2], 'realtime');
+        value1 = values[1];
+        if (value1 == 'active') {
+            sway.log('Active changed, ' + values[0] + ' ' + values[2], 'realtime');
+            vissom.active(plugin, values[2]);
+        } else {
+            // TODO: get config from core
+            // TODO: refactor this so that we're calling orientation for orientation
+            // send OSC
+            //vissom.orientation(plugin.output, data.orientation);
+            vissom.orientation(plugin, values[1], values[2], values[3]);
+            sway.log('Message received ' + values[1] + ' ' + values[2], 'realtime');
+        }
     }),
     onPing: new utils.Multicast(),
     onPacket: new utils.Multicast(function (packet) {
@@ -52,6 +61,11 @@ var decorator = {
 
 // TODO: REFACTOR TO NEW LIBRARY -----------------------------
 var vissom = {
+    active: function (config, value) {
+        var output = config.output;
+        var aConfig = config.active;
+        sway.osc.send(output, output.addressPrefix + aConfig.address, value);
+    },
     orientation: function (config, x, y, z) {
         var output = config.output;
         var oConfig = config.orientation;

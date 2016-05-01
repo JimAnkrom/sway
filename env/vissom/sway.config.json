@@ -8,6 +8,10 @@
     "users": {
         "timeout": 30000
     },
+    "logging": {
+        "minSeverity": -1,
+        "output": "console"
+    },
     "api": {
         "heartbeat": "/pulse",
         "action": "/action",

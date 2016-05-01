@@ -163,7 +163,7 @@ module.exports = function (sway) {
         },
         // get next channel from load balancer.
         assign: function (user) {
-            //console.log("Beginning Assign");
+            sway.log("Beginning Assign - user " + JSON.stringify(user), 'ChannelControl');
             sway.channelControl.debugChannels();
             var channel = this.LoadBalancer.call(sway.balancer);
             // if channel is null, we need to put the user into the overflow queue
@@ -233,8 +233,7 @@ module.exports = function (sway) {
             // TODO: Check to ensure queue has space
             var key = this.deck[this.channelIndex];
             var chan = sway.channelControl.channels[key];
-            // if (sway.core.debug)
-            console.log("RoundRobin: Channel Selected - " + chan.name + ' from key ' + key);
+            sway.log("RoundRobin: Channel Selected - " + chan.name + ' from key ' + key);
             // loop over channels
             if (this.channelIndex + 1 == this.deck.length)
                 this.channelIndex = 0;

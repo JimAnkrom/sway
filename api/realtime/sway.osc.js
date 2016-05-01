@@ -59,7 +59,7 @@ module.exports = function (sway) {
         send: function (config, oscAddress) {
             var message = new Message(oscAddress, 2, arguments);
             var buffer = oscMin.toBuffer(message);
-            //console.log("Sending to " + config.address + ':' + config.port);
+            sway.log("Sending to " + config.address + ':' + config.port + ' ' + JSON.stringify(arguments), 'sway.osc', -1);
             // TODO: wrap this so you just send buffer
             this.socket.send(buffer, 0, buffer.length, config.port, config.address, function (err, bytes) {
                 if (err) { console.log('OSC Socket Error: ' + JSON.stringify(err)); }
@@ -69,7 +69,8 @@ module.exports = function (sway) {
         // Not yet working
         sendToAddress: function (ipAddress, port, address) {
             // remove ip and port off the arguments...
-            //if (sway.debug) console.log(ipAddress + ' / ' + port + ' Sending to ' + address + " " + JSON.stringify(arguments[3]));
+            //if (sway.debug)
+            //console.log(ipAddress + ' / ' + port + ' Sending to ' + address + " " + JSON.stringify(arguments[3]));
             console.log(ipAddress + ' / ' + port + ' Sending to ' + address + " " + JSON.stringify(arguments[3]));
             var message = new Message(address, 3, arguments);
 

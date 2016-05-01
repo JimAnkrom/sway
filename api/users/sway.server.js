@@ -132,8 +132,9 @@ module.exports = function (sway) {
             req.config = {
                 idleTimeout: sway.config.user.idleTimeout,
                 controlInterval: sway.config.user.controlInterval,
-                api: sway.config.api
-            }
+                api: sway.config.api,
+                screen: sway.core.installation.screen
+            };
             next();
         },
         addMessages: function (messages, response) {

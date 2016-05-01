@@ -8,12 +8,10 @@
  */
 
 module.exports = function (sway) {
-
     var utils = sway.utility;
 // Need a workflow controller
 // need to offer: "change state to xxxx"
 // expose events for state changed
-
 
     sway.Queue = (function () {
         function queue_add(item) {
@@ -51,7 +49,6 @@ module.exports = function (sway) {
         return queue;
     })();
 
-
     sway.workflowController = {
         // This is called by the client to advance the workflow action to the next step, assuming the requirements are met
         // there should be some message to indicate a failure to the client
@@ -88,12 +85,13 @@ module.exports = function (sway) {
                 return;
             }
 
-            if (req.user.transition) {
+            // look for the transition request
+            if (req.state && req.state.transition) {
                 // validate the transition and deliver the new state
                 // verify that the state name exists in the workflow as a state
                 // if yes, then validate that transition,
 
-                var trans = req.user.transition,
+                var trans = req.state.transition,
                     isValid = false;
                 // currentState can be either a string or array
                 if (Array.isArray(currentState)) {

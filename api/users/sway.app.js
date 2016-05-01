@@ -3,25 +3,25 @@
  *
  * Main entry point for Sway User Services app
  */
-var sway = require('./../core/sway.core.js'),
+var moduleName = 'sway.app',
+    sway = require('./../core/sway.core.js'),
     toolbox = require('../lib/toolbox.node.js');
 
-    if (!Object.assign) console.log('Critical Error: Object.assign does not exist! Try a newer version of node.js.');
-    if (!toolbox) sway.log('toolbox not found', 'toolbox');
-    if (!toolbox.observe) sway.log('observe not found', 'toolbox');
+// add sway.server namespace
+require('./sway.server.js')(sway);
+
+// Validation
+if (!Object.assign) sway.log('Critical Error: Object.assign does not exist! Try a newer version of node.js.', moduleName, 10);
+if (!toolbox) sway.log('toolbox not found', moduleName, 10);
+//if (!toolbox.observe) sway.log('observe not found', 'toolbox');
+if (!sway.workflowController) sway.log('Critical Error: WorkflowController not found!', moduleName, 10);
+
 
 var config = sway.core.config;
 
 // TODO: Move to a plugin initialization
 sway.plugins.realtime.init();
 
-// TODO: moving this to realtime server
-//var realtime = require('./realtime/sway.realtime.js');
-
-// add sway.server namespace
-require('./sway.server.js')(sway);
-
-if (!sway.workflow) sway.log('Critical Error: Workflow not found!', 'Workflow');
-// TODO: Wire up the sway API
+// Wire up the sway API
 require('./sway.api.js')(sway);
 

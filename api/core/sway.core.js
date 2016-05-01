@@ -10,13 +10,21 @@ var path = require('path');
 
 var sway = {
     debug: true,
+    logOutput: 'console',
     core: new utils.Configuration({ debug: true }),
     // default debug to true, overwrite with config
     // TODO: refactor log out to toolbox
-    log: function (message, moduleName) {
-        moduleName = moduleName || 'no module given';
+    log: function (message, moduleName, severity, output) {
+        var logConfig = sway.core.config.logging;
+        if (!severity) severity = 0;
+        output = output || logConfig.output;
+        moduleName = moduleName || 'no module';
         if (console && sway.debug) {
-            console.log('[' + moduleName + '] - ' + message);
+            if (severity >= logConfig.minSeverity) {
+                console.log('[' + moduleName + '] - ' + message);
+            } else {
+                console.log('severity ' + severity);
+            }
         }
     },
     utility: utils
@@ -35,7 +43,7 @@ var sway = {
             // load custom configurations from environment folders
             core.load('config', envPath + 'sway.config.json');
             core.load('channels', envPath + 'sway.channels.json');
-            core.load('installation', envPath + 'sway.installation.json')
+            core.load('installation', envPath + 'sway.installation.json');
         }
     });
     // load environment configuration
@@ -64,9 +72,9 @@ core.attach('config', {
 })(sway.core);
 
 require('./../users/sway.channels.js')(sway);
-require('./../realtime/sway.control.js')(sway);
+//require('./../realtime/sway.control.js')(sway);
 require('./../users/sway.users.js')(sway);
-require('./../realtime/sway.osc.js')(sway);
+//require('./../realtime/sway.osc.js')(sway);
 require('./../plugins/sway.plugins.js')(sway);
 
 //// TODO: maybe this need be set by sway.user?
