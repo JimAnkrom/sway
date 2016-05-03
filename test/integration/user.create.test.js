@@ -131,7 +131,137 @@ describe('Create User', function() {
         expect(response.state.name).to.equal(initialState);
     });
 
+    it('assigns a channel, queues the next user, and reports each in response', function () {
+        //workflow
+        var req = {
+                body: {
+                    uid: 1111
+                },
+                headers: {
+                    "user-agent": 'fake browser'
+                }
+            },
+            req2 = {
+                body: {
+                    uid: 1112
+                },
+                headers: {
+                    "user-agent": 'fake browser'
+                }
+            },
+            req3 = {
+                body: {
+                    uid: 1113
+                },
+                headers: {
+                    "user-agent": 'fake browser'
+                }
+            },
+            response = null,
+            res = fakeResponse(function () {}, function (res) {
+                response = res;
+            }),
+            next = function () {},
+            initialState = sway.core.installation.initialState;
 
+        sway.auth.createUser(req, res, next);
+        sway.server.finalizeUserResponse(req, res);
+        expect(response.channel).to.exist;
+        expect(response.queue).to.not.exist;
 
+        sway.auth.createUser(req2, res, next);
+        sway.server.finalizeUserResponse(req2, res);
+        expect(response.queue).to.exist;
+        expect(response.channel).to.not.exist;
+        expect(response.queue.count).to.equal(0);
 
+        sway.auth.createUser(req3, res, next);
+        sway.server.finalizeUserResponse(req3, res);
+        expect(response.queue).to.exist;
+        expect(response.channel).to.not.exist;
+        expect(response.queue.count).to.equal(1);
+    });
+
+    describe('Overflow Queue', function () {
+        it('should notify the user of their position in the queue via heartbeat', function () {
+            //workflow
+            var req = {
+                    body: {
+                        token: {
+                            uid: 1111
+                        }
+                    },
+                    headers: {
+                        "user-agent": 'fake browser'
+                    }
+                },
+                req2 = {
+                    body: {
+                        token: {
+                            uid: 1112
+                        }
+                    },
+                    headers: {
+                        "user-agent": 'fake browser'
+                    }
+                },
+                req3 = {
+                    body: {
+                        token: {
+                            uid: 1113
+                        }
+                    },
+                    headers: {
+                        "user-agent": 'fake browser'
+                    }
+                },
+                response = null,
+                res = fakeResponse(function () {}, function (res) {
+                    response = res;
+                }),
+                next = function () {},
+                initialState = sway.core.installation.initialState;
+
+            sway.auth.createUser(req, res, next);
+            sway.auth.createUser(req2, res, next);
+            sway.auth.createUser(req3, res, next);
+
+            expect(req3.user.queue.count).to.equal(1);
+
+            sway.channelControl.remove(req.user.channel, req.user);
+
+            req2.user = null;
+            req2.body.token = req2.token;
+            sway.auth.authenticate(req2, res, next);
+            sway.server.heartbeat(req2, res, next);
+            sway.server.finalizeUserResponse(req2, res, next);
+
+            expect(response.queue).to.not.exist;
+            expect(response.channel).to.exist;
+
+            req3.user = null;
+            req3.body.token = req3.token;
+            sway.auth.authenticate(req3, res, next);
+            sway.server.heartbeat(req3, res, next);
+            sway.server.finalizeUserResponse(req3, res, next);
+
+            expect(response.queue).to.exist;
+            expect(response.queue.count).to.equal(0);
+            expect(response.channel).to.not.exist;
+
+            // then let's remove user 2 and make sure the queue goes away
+            expect(sway.channelControl.overflowQueue.length).to.equal(1);
+            sway.channelControl.remove(req2.user.channel, req2.user);
+            expect(sway.channelControl.overflowQueue.length).to.equal(0);
+
+            req3.user = null;
+            req3.body.token = req3.token;
+            sway.auth.authenticate(req3, res, next);
+            sway.server.heartbeat(req3, res, next);
+            sway.server.finalizeUserResponse(req3, res, next);
+
+            expect(response.queue).to.not.exist;
+            expect(response.channel).to.exist;
+        });
+    });
 });

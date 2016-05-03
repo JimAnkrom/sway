@@ -40,15 +40,18 @@ module.exports = function (sway) {
         },
         // Expire / scavenge cache
         expire: function () {
-            var newUserList = [];
-            var expiredUserBatch = [];
-            var timeoutLower = Date.now() - config.users.timeout;
-            for (var i = 0; i < userList.length; i++) {
-                var u = userList[i];
+            var i, u,
+                len = userList.length,
+                newUserList = [],
+                expiredUserBatch = [],
+                timeoutLower = Date.now() - config.users.timeout;
+
+            for (i = 0; i < userList.length; i++) {
+                u = userList[i];
                 if (u.lastLogin && (u.lastLogin < timeoutLower)) {
                     if (usersService.onUserExpired) usersService.onUserExpired(u);
                     u.expired = true;
-                    console.log('Expired user ' + u.uid);
+                    sway.log('Expiring user ' + u.uid, 'sway.users', 0);
                     expiredUserBatch.push(u);
                 } else {
                     newUserList.push(u);

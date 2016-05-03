@@ -43,10 +43,12 @@ module.exports = function (sway) {
                 }
             } else {
                 if (!auth) {
-                    console.log()
+                    //console.log()
                 }
                 // lookup the user and append to the request
-                if (!auth.uid) this.setErrorMessage(res, 'Authentication Error: User UID Not Found!');
+                if (!auth.uid) {
+                    this.setErrorMessage(res, 'Authentication Error: User UID Not Found!');
+                }
                 else {
                     var user = sway.users.findByUid(auth.uid);
                     if (user) {
@@ -68,8 +70,7 @@ module.exports = function (sway) {
         // Get auth status & channel, set into body
         "authUser": function (req, res, next) {
             var user = req.user;
-            // TODO: determine if a user was banned
-            // Update the user channel info (move them along in the queue too
+            // Update the user channel info
             sway.channels.update(user);
             next();
         },
@@ -134,7 +135,7 @@ module.exports = function (sway) {
             next();
         },
         setErrorMessage: function (res, message) {
-            console.log('User Error Message: ' + message);
+            sway.log('User Error Message: ' + message, 'sway.auth', 6);
             res.json({message: message});
             res.end();
         },

@@ -54,8 +54,8 @@ module.exports = function (sway) {
     */
 // Authorize these requests as a user
     userRouter.use(sway.auth.authUser);
-// TODO: check user pulse
-//userRouter.post(config.api.heartbeat, sway.server.heartbeat);
+// check user pulse
+    userRouter.post(config.api.heartbeat, sway.server.heartbeat);
 // remove users that have timed out
     userRouter.post(config.api.deleteUser, sway.server.expire);
 // submit control message
@@ -101,7 +101,7 @@ module.exports = function (sway) {
 
 //app.get(config.api.monitor, adminRouter);
 // Wire the user router to api calls
-//app.post(config.api.heartbeat, userRouter);
+    app.post(config.api.heartbeat, userRouter);
     app.post(config.api.deleteUser, userRouter);
     app.post(config.api.control, userRouter);
 

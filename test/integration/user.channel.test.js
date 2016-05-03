@@ -44,8 +44,8 @@ describe('Channel Load Balancer', function () {
         sway.channelControl.assign(user1);
         sway.channelControl.assign(user2);
 
-        expect(user2.channel).to.exist;
-        console.log(JSON.stringify(user2.channel));
+        expect(user2.queue).to.exist;
+        console.log(JSON.stringify(user2.queue));
     });
 
     it('should put users in a channel after wait queue', function () {
@@ -66,15 +66,54 @@ describe('Channel Load Balancer', function () {
         sway.channelControl.assign(user2);
         sway.channelControl.assign(user3);
 
-        expect(user2.channel).to.exist;
+        expect(user4.queue).to.exist;
+        expect(user2.queue).to.exist;
         console.log(JSON.stringify(user2.channel));
 
-       sway.channelControl.remove(user1.channel, user1);
+        sway.channelControl.remove(user1.channel, user1);
 
+        expect(user4.queue).to.be.null;
         expect(user4.channel).to.exist;
         expect(user4.channel.displayName).to.equal(channelName);
         console.log(user4.channel.displayName);
 
         expect(sway.channelControl.overflowQueue.length).to.equal(2);
+
+        // Remove user 4, check 2 and 3's setting
+        sway.channelControl.remove(user4.channel, user4);
+        expect(user2.queue).to.be.null;
+        expect(user2.channel).to.exist;
+        expect(user3.queue).to.exist;
+        expect(sway.channelControl.overflowQueue.length).to.equal(1);
+
+
     });
+
+    it('should put correctly set user queue information, then channel info', function () {
+        // call enqueue one more than # of channels
+        var keys = Object.keys(sway.channelControl.channels),
+            user1 = utils.fakes.user({ id: 1 }),
+            user2 = utils.fakes.user({ id: 2 });
+
+        expect(keys.length).to.equal(1);
+
+        sway.channelControl.assign(user1);
+
+        var channelName = user1.channel.displayName;
+
+        sway.channelControl.assign(user2);
+
+        expect(user2.queue).to.exist;
+        console.log(JSON.stringify(user2.queue));
+
+        sway.channelControl.remove(user1.channel, user1);
+
+        expect(user2.queue).to.be.null;
+        expect(user2.channel).to.exist;
+        expect(user2.channel.displayName).to.equal(channelName);
+        console.log(user2.channel.displayName);
+
+        expect(sway.channelControl.overflowQueue.length).to.equal(0);
+    });
+
 });

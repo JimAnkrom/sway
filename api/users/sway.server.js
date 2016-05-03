@@ -65,16 +65,20 @@ module.exports = function (sway) {
         },
         // Middleware to complete the response format and send it
         finalizeUserResponse: function (req, res) {
-            var response = {
+            var user = req.user,
+                response = {
                 token: req.token
             },
                 chan,
                 config;
 
-            // Add state
-            if (req.user) response.state = req.user.state;
+            //reset this now because we're sending the user out
+            user.changed = false;
 
-            chan = req.user.channel || {};
+            // Add workflow state
+            if (user) response.state = user.state;
+
+            chan = user.channel || {};
             if (chan.name) {
                 response.channel = {
                     name: chan.name,
@@ -102,10 +106,14 @@ module.exports = function (sway) {
 
                     response.channel[chan.plugin] = channelPlugin;
                 }
+            } else {
+                if (user.queue) {
+                    response.queue = user.queue;
+                }
             }
 
             // add user messages
-            swayServer.addMessages(req.user.message, response);
+            swayServer.addMessages(user.message, response);
             // add system messages
             swayServer.addMessages(req.message, response);
 
@@ -150,7 +158,8 @@ module.exports = function (sway) {
         // shortcircuit the response IF you don't have a message, config update, or redirect, otherwise next()
         shortResponse: function (req, res, next) {
             if (
-                req.message
+                (req.user && req.user.changed)
+                || req.message
                 || req.config
                 || req.redirect
                 ) { next(); }

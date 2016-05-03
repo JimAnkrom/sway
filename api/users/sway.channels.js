@@ -74,16 +74,29 @@ module.exports = function (sway) {
             if (sway.core.debug) console.log("Enqueuing user " + user.uid + " into " + channel.displayName);
             // get size
             var size = channel.queueSize ? channel.queueSize : sway.config.channel.defaultQueueSize;
+            // set notifications on the user
+            user.changed = true;
+            // If we've got a sneaky user trying to hop out of their channel, at the least remove them from the channel they were in
+            if (user.channel) {
+                //console.log("Removing user " + user.uid + " from " + user.channel.displayName);
+                sway.channelControl.remove(user.channel, user);
+                sway.log("Removed user " + user.uid + " from prior channel.", 'sway.channels', 0);
+            }
 
             // if channel has users in it
             if (channel.users && channel.users.length != 0) {
                 // if size is not unlimited (-1) and we are at capacity
                 if (size >= 0 && channel.users.length >= size) {
                     // error, adding to a full queue
-                    //console.log("Overflowing user " + user.uid);
-                    sway.channelControl.overflowQueue.push(user);
-                    // TODO: This needs to be something more formal than just returning the array
-                    user.channel = sway.config.overflowQueue;
+                    sway.log("Overflowing user " + user.id, 'sway.channels', 0);
+                    var overflowQueue = sway.channelControl.overflowQueue;
+
+                    // Add the queue info to the user
+                    var queue = {
+                        count: overflowQueue.length
+                    };
+                    overflowQueue.push(user);
+                    user.queue = Object.assign(queue, sway.config.overflowQueue);
                     return;
                 }
             } else {
@@ -91,12 +104,7 @@ module.exports = function (sway) {
                 //console.log("resetting users on channel " + channel.displayName);
                 if (!(channel.users)) channel.users = [];
             }
-            // If we've got a sneaky user trying to hop out of their channel, at the least remove them from the channel they were in
-            if (user.channel) {
-                //console.log("Removing user " + user.uid + " from " + user.channel.displayName);
-                sway.channelControl.remove(user.channel, user);
-                //console.log("Removed user " + user.uid + " : now " + user.channel);
-            }
+
             // We're good, add to the queue
             channel.users.push(user);
             // ensure the first user in queue is still active (maybe it's our new user, who cares)
@@ -108,6 +116,7 @@ module.exports = function (sway) {
         // pop & deactivate the next a user from the channel queue, activate the next user in the channel queue
         dequeue: function (channel) {
             var u = channel.users.shift();
+            u.changed = true;
             u.active = false;
             u.channel = null;
             if (this.onDequeue) this.onDequeue(u, channel);
@@ -139,7 +148,12 @@ module.exports = function (sway) {
                 if (sway.channelControl.overflowQueue.length) {
                     var u = sway.channelControl.overflowQueue.shift();
                     u.channel = null;
+                    u.queue = null;
                     this.enqueue(channel, u);
+                    _.each(sway.channelControl.overflowQueue, function (user) {
+                        if (user.queue) user.queue.count--;
+                        user.changed = true;
+                    });
                 } else {
                     console.log("No users to queue");
                 }
@@ -155,7 +169,7 @@ module.exports = function (sway) {
                     sway.channelControl.assign(user);
                 }
                 // TODO: determine if they are the active user in that channel or not (queued)
-                // TODO: if they are not active, determine wait time
+                // TODO: if they are not active, determine wait time - this is in the overflow queue now
                 if (user.channel && !(user.active)) {
 
                 }
