@@ -182,7 +182,16 @@ describe('Create User', function() {
         expect(response.queue.count).to.equal(1);
     });
 
+
     describe('Overflow Queue', function () {
+        function heartbeat(req, res, next) {
+            req.user = null;
+            req.body.token = req.token;
+            sway.auth.authenticate(req, res, next);
+            sway.server.heartbeat(req, res, next);
+            sway.server.finalizeUserResponse(req, res, next);
+        }
+
         it('should notify the user of their position in the queue via heartbeat', function () {
             //workflow
             var req = {
@@ -262,6 +271,98 @@ describe('Create User', function() {
 
             expect(response.queue).to.not.exist;
             expect(response.channel).to.exist;
+        });
+        it('should strip out the expired users', function () {
+            var req = utils.fakes.request(11),
+                req2 = utils.fakes.request(12),
+                req3 = utils.fakes.request(13),
+                req4 = utils.fakes.request(14),
+                req5 = utils.fakes.request(15),
+                req6 = utils.fakes.request(16),
+                req7 = utils.fakes.request(17),
+                response = null,
+                res = fakeResponse(function () {}, function (res) {
+                    response = res;
+                }),
+                next = function () {};
+
+            sway.auth.createUser(req, res, next);
+            sway.auth.createUser(req2, res, next);
+            sway.auth.createUser(req3, res, next);
+
+            expect(req3.user.queue.count).to.equal(1);
+
+            sway.channelControl.remove(req.user.channel, req.user);
+
+            heartbeat(req2, res, next);
+
+            expect(response.queue).to.not.exist;
+            expect(response.channel).to.exist;
+
+            sway.auth.createUser(req4, res, next);
+
+            heartbeat(req3, res, next);
+
+            expect(response.queue).to.exist;
+            expect(response.queue.count).to.equal(0);
+            expect(response.channel).to.not.exist;
+
+            // then let's remove user 2 and make sure the queue goes away
+            expect(sway.channelControl.overflowQueue.length).to.equal(2);
+            sway.channelControl.remove(req2.user.channel, req2.user);
+            expect(sway.channelControl.overflowQueue.length).to.equal(1);
+
+
+            // Heartbeat for user 4
+            heartbeat(req4, res, next);
+
+            expect(response.queue).to.exist;
+            expect(response.queue.count).to.equal(0);
+            expect(response.channel).to.not.exist;
+
+            heartbeat(req3, res, next);
+
+            expect(response.queue).to.not.exist;
+            expect(response.channel).to.exist;
+
+            sway.auth.createUser(req5, res, next);
+            sway.auth.createUser(req6, res, next);
+
+            expect(sway.channelControl.overflowQueue.length).to.equal(3);
+
+            heartbeat(req4, res, next);
+            expect(response.queue).to.exist;
+            expect(response.queue.count).to.equal(0);
+
+            heartbeat(req5, res, next);
+            expect(response.queue).to.exist;
+            expect(response.queue.count).to.equal(1);
+
+            heartbeat(req6, res, next);
+            expect(response.queue).to.exist;
+            expect(response.queue.count).to.equal(2);
+
+            req4.user.expired = true;
+
+            expect(sway.channelControl.overflowQueue.length).to.equal(3);
+            sway.channelControl.remove(req3.user.channel, req3.user);
+            expect(sway.channelControl.overflowQueue.length).to.equal(1);
+
+            // Heartbeat for user 4 to get the expire to take
+            heartbeat(req4, res, next);
+
+            console.log(JSON.stringify(response));
+            expect(response.queue).to.not.exist;
+            expect(response.channel).to.not.exist;
+
+            heartbeat(req5, res, next);
+            expect(response.queue).to.not.exist;
+            expect(response.channel).to.exist;
+
+            heartbeat(req6, res, next);
+            expect(response.queue).to.exist;
+            expect(response.queue.count).to.equal(0);
+
         });
     });
 });

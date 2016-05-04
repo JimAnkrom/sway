@@ -143,19 +143,37 @@ module.exports = function (sway) {
                 u.channel = channel;
                 //console.log("channel set to " + channel.displayName);
             } else {
-
+                // pull user from the overflow
+                var queue = sway.channelControl.overflowQueue;
                 // if we have an overflow queue, use that
-                if (sway.channelControl.overflowQueue.length) {
-                    var u = sway.channelControl.overflowQueue.shift();
-                    u.channel = null;
-                    u.queue = null;
-                    this.enqueue(channel, u);
-                    _.each(sway.channelControl.overflowQueue, function (user) {
-                        if (user.queue) user.queue.count--;
-                        user.changed = true;
-                    });
+                if (queue.length) {
+                    var user,
+                        count = 0,
+                        result = [];
+
+                    // update users in the overflow... use while loop because we
+                    while (u=queue.shift()) {
+                        // TODO: does expire de-queue a user?
+                        if (u.expired) {
+                            u.channel = null;
+                            u.queue = null;
+                            u.changed = true;
+                        } else {
+                            if (!user) {
+                                user = u;
+                                u.queue = null;
+                                this.enqueue(channel, u);
+                            } else {
+                                u.queue.count = count;
+                                u.changed = true;
+                                result.push(u);
+                                count++;
+                            }
+                        }
+                    }
+                    sway.channelControl.overflowQueue = result;
                 } else {
-                    console.log("No users to queue");
+                    sway.log("No users to queue",'sway.channels',0);
                 }
             }
         },

@@ -15,6 +15,17 @@ module.exports = {
                 cookie: function (name, value) {}
             };
         },
+        request: function (userId) {
+            userId = userId || 1;
+            return {
+                body: {
+                    uid: userId
+                },
+                headers: {
+                    "user-agent": 'fake browser'
+                }
+            };
+        },
         user: function (options) {
             options = options || {};
             return {
