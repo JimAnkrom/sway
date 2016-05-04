@@ -27,7 +27,12 @@ module.exports = function (sway) {
 
 // TODO: convert this to a multicast approach instead of just set handler
     sway.users.onExpireUserBatch = function (batch) {
-
+        _.each(batch, function (u) {
+            // remove each from their respective channel
+            if (u.channel) {
+                sway.channelControl.remove(u.channel, u);
+            }
+        });
     };
 
     // SwayServer is the general business layer for sway
