@@ -107,7 +107,15 @@ module.exports = function (sway) {
                 }
             }
             // create the user.
-            var user = sway.users.createUser(req.body);
+
+            try {
+                var user = sway.users.createUser(req.body);
+            }
+
+            catch (e) {
+                sway.logToFile('Error creating user: ' + e.message);
+            }
+            
             // set user agent... for, like, later.
             user.agent = req.headers['user-agent'];
             // Create our token and add it to req (it's later applied correctly to response)

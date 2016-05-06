@@ -7,6 +7,7 @@
 var utils = require('./sway.utility.js');
 
 var path = require('path');
+var fs = require('fs');
 
 var sway = {
     debug: true,
@@ -26,6 +27,15 @@ var sway = {
                 console.log('severity ' + severity);
             }
         }
+    },
+    logToFile: function (data) {
+        var logfile = './logfile.txt';
+        var timestamp = new Date(Date.now());
+        var logEntry = '[' + timestamp.toISOString() + '] ' + data + '\n';
+
+        fs.appendFile(logfile, logEntry, function (err) {
+            if (err) throw err;
+        });
     },
     utility: utils
 };

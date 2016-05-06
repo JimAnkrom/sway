@@ -142,6 +142,7 @@ module.exports = function (sway) {
             res.status(200).json(response);
         },
         updateUserConfig: function (req, res, next) {
+            // todo: error handling
             req.config = {
                 idleTimeout: sway.config.user.idleTimeout,
                 controlInterval: sway.config.user.controlInterval,
