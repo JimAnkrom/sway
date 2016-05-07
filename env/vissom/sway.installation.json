@@ -1,16 +1,16 @@
 {
     "screen": {
-        "heading": 67,
+        "heading": 300,
         "correction": -13,
-        "size": 120,
+        "size": 1200,
         "calSize": 100
     },
     "input": {
-        "address": "192.168.1.10",
+        "address": "192.168.1.240",
         "port": 3000
     },
     "output": {
-        "address": "192.168.1.10",
+        "address": "192.168.1.245",
         "port": 10000
     },
     "workflow": {

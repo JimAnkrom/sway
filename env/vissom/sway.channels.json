@@ -1,6 +1,6 @@
 {
     "Player1": {
-        "displayName": "Layer 1 Opacity",
+        "displayName": "Player 1",
         "description": "This channel controls layer 1's opacity",
         "state": {
             "color": {
@@ -19,6 +19,112 @@
                 "id": 1,
                 "transform": "vissom",
                 "addressPrefix": "/p1"
+            },
+            "orientation": {
+                "alpha": {
+                    "address": "/posx",
+                    "ratioPolar": {
+                        "floor": 100,
+                        "ceiling": 270
+                    }
+                },
+                "beta": {
+                    "address": "/posy",
+                    "constraints": {
+                        "floor": -25,
+                        "ceiling": 110
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    }
+                },
+                "gamma": {
+                    "constraints": {
+                        "floor": -90,
+                        "ceiling": 90
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    }
+                }
+            }
+        }
+    },
+    "Player2": {
+        "displayName": "Player 2",
+        "description": "This channel controls layer 1's opacity",
+        "state": {
+            "color": {
+                "r": 255,
+                "g": 255,
+                "b": 0
+            },
+            "shape": 2
+        },
+
+        "plugin": "realtime",
+        "realtime": {
+            "input": {
+            },
+            "output": {
+                "id": 1,
+                "transform": "vissom",
+                "addressPrefix": "/p2"
+            },
+            "orientation": {
+                "alpha": {
+                    "address": "/posx",
+                    "ratioPolar": {
+                        "floor": 100,
+                        "ceiling": 270
+                    }
+                },
+                "beta": {
+                    "address": "/posy",
+                    "constraints": {
+                        "floor": -25,
+                        "ceiling": 110
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    }
+                },
+                "gamma": {
+                    "constraints": {
+                        "floor": -90,
+                        "ceiling": 90
+                    },
+                    "scale": {
+                        "min": 0,
+                        "max": 1
+                    }
+                }
+            }
+        }
+    },
+    "Player3": {
+        "displayName": "Player 3",
+        "description": "This channel controls layer 1's opacity",
+        "state": {
+            "color": {
+                "r": 255,
+                "g": 153,
+                "b": 51
+            },
+            "shape": 3
+        },
+
+        "plugin": "realtime",
+        "realtime": {
+            "input": {
+            },
+            "output": {
+                "id": 1,
+                "transform": "vissom",
+                "addressPrefix": "/p3"
             },
             "orientation": {
                 "alpha": {
