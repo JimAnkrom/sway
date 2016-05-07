@@ -4,7 +4,7 @@
 var gulp = require('gulp'),
     concat = require('gulp-concat');
     //karma = require('karma').Server,
-    //uglify = require('gulp-uglify'),
+    //uglify = require('gulp-uglify')
     //bower = require('gulp-bower');
 
 

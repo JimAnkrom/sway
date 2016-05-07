@@ -7,13 +7,16 @@
  TODO: Establish a heartbeat connection
  */
 
-var debug = true;
-var utils = require('./../core/sway.utility.js');
-var engine = require('engine.io');
+var debug = true,
+    utils = require('./../core/sway.utility.js'),
+    engine = require('engine.io'),
+    sway = require('./../core/sway.core.js'),
+    ws = require('ws');
 
-var sway = require('./../core/sway.core.js');
 require('./sway.control.js')(sway);
 require('./sway.osc.js')(sway);
+
+sway.core.debug = debug;
 //    toolbox = require('../../../toolbox/dist/toolbox.node.js');
 sway.osc.open();
 console.log('Starting socket engine at port 3000');
@@ -34,17 +37,34 @@ var decorator = {
         }
 
         value1 = values[1];
-        if (value1 == 'active') {
-            sway.log('Active changed, ' + values[0] + ' ' + values[2], 'realtime');
-            vissom.active(plugin, values[2]);
-        } else {
-            // TODO: get config from core
-            // TODO: refactor this so that we're calling orientation for orientation
-            // send OSC
-            //vissom.orientation(plugin.output, data.orientation);
-            vissom.orientation(plugin, values[1], values[2], values[3]);
-            sway.log('Message received ' + values[1] + ' ' + values[2], 'realtime');
+        switch (value1) {
+            case 'active':
+                vissom.active(plugin, values[2]);
+                break;
+            case 'shape':
+                vissom.shape(plugin, values[2]);
+                break;
+            case 'size':
+                vissom.size(plugin, values[2]);
+                break;
+            case 'color':
+                vissom.color(plugin, values[2], values[3], values[4]);
+                break;
+            default:
+                vissom.orientation(plugin, values[1], values[2], values[3]);
         }
+
+        //if (value1 == 'active') {
+        //    sway.log('Active changed, ' + values[0] + ' ' + values[2], 'realtime');
+        //
+        //} else {
+        //    // TODO: get config from core
+        //    // TODO: refactor this so that we're calling orientation for orientation
+        //    // send OSC
+        //    //vissom.orientation(plugin.output, data.orientation);
+        //
+        //    sway.log('Message received ' + values[1] + ' ' + values[2], 'realtime');
+        //}
     }),
     onPing: new utils.Multicast(),
     onPacket: new utils.Multicast(function (packet) {
@@ -59,12 +79,38 @@ var decorator = {
     })
 };
 
+var vConfig = {
+    "active": {
+        "address": "/active"
+    },
+    "size": {
+        "address": "/size"
+    },
+    "color": {
+        "addressR": "/colr",
+        "addressG": "/colg",
+        "addressB": "/colb"
+    },
+    "shape": {
+        "address": "/shape"
+    }
+};
+
 // TODO: REFACTOR TO NEW LIBRARY -----------------------------
 var vissom = {
     active: function (config, value) {
-        var output = config.output;
-        var aConfig = config.active;
-        sway.osc.send(output, output.addressPrefix + aConfig.address, value);
+        sway.osc.send(config.output, config.output.addressPrefix + vConfig.active.address, Number(value));
+    },
+    shape: function (config, value) {
+        sway.osc.send(config.output, config.output.addressPrefix + vConfig.shape.address, Number(value));
+    },
+    size: function (config, value) {
+        sway.osc.send(config.output, config.output.addressPrefix + vConfig.size.address, Number(value));
+    },
+    color: function (config, valueR, valueG, valueB) {
+        sway.osc.send(config.output, config.output.addressPrefix + vConfig.color.addressR, Number(valueR));
+        sway.osc.send(config.output, config.output.addressPrefix + vConfig.color.addressG, Number(valueG));
+        sway.osc.send(config.output, config.output.addressPrefix + vConfig.color.addressB, Number(valueB));
     },
     orientation: function (config, x, y, z) {
         var output = config.output;
@@ -77,12 +123,10 @@ var vissom = {
         var value = Number(x);
         if (!isNaN(value)) {
             sway.osc.send(output, output.addressPrefix + oConfig.alpha.address, value);
-            //sway.osc.send(config, '/layer1/video/opacity/values', value);
         }
         value = Number(y);
         if (!isNaN(value)) {
             sway.osc.send(output, output.addressPrefix + oConfig.beta.address, value);
-            //sway.osc.send(config, '/layer1/video/opacity/values', value);
         }
     }
 };

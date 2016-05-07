@@ -56,7 +56,7 @@ function Configuration (options) {
             // config.reload = self.load.bind(self, configName, path, options);
         }
         catch(err) {
-            if (sway.core && sway.core.log) sway.core.log('Error: Configuration.Load(' + configName + '): ' + err.message, 'Configuration');
+            if (sway && sway.core && sway.core.log) sway.core.log('Error: Configuration.Load(' + configName + '): ' + err.message, 'Configuration');
         }
 
         if (!watchers[configName]) {
@@ -64,12 +64,12 @@ function Configuration (options) {
                 watchers[configName] = fs.watch(path, {persistent: true}, function (event, filename) {
                     if (event == 'change') {
                         self.load(configName, path, options);
-                        if (sway.core && sway.core.log) sway.core.log(filename + ' reloaded due to ' + event + ' event on file ' + filename, 'Configuration');
+                        if (sway && sway.core && sway.core.log) sway.core.log(filename + ' reloaded due to ' + event + ' event on file ' + filename, 'Configuration');
                     }
                 });
             } catch (err)
             {
-                if (sway.core && sway.core.log) sway.core.log('Error: Exception while watching configuration: ' + filename + ' - ' + err.message, 'Configuration');
+                if (sway && sway.core && sway.core.log) sway.core.log('Error: Exception while watching configuration: ' + filename + ' - ' + err.message, 'Configuration');
             }
         }
     };

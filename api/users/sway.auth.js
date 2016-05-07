@@ -92,7 +92,7 @@ module.exports = function (sway) {
                         // TODO: Probably want to do something else here rather than a reassign
                         // reassign the user to a new channel
                         sway.channelControl.reassign(user);
-                        if (user.channel.redirect) {
+                        if (user.channel && user.channel.redirect) {
                             console.log("assigning redirect to req");
                             req.redirect = user.channel.redirect;
                         }

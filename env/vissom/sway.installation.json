@@ -10,7 +10,7 @@
         "port": 3000
     },
     "output": {
-        "address": "192.168.1.21",
+        "address": "192.168.1.10",
         "port": 10000
     },
     "workflow": {

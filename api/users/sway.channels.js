@@ -164,7 +164,7 @@ module.exports = function (sway) {
                                 u.queue = null;
                                 this.enqueue(channel, u);
                             } else {
-                                u.queue.count = count;
+                                if (u.queue) u.queue.count = count;
                                 u.changed = true;
                                 result.push(u);
                                 count++;

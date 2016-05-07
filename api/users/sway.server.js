@@ -95,6 +95,10 @@ module.exports = function (sway) {
                     ip: chan.ip
                 };
 
+                if (chan.state) {
+                    response.channel.state = chan.state;
+                }
+
                 if (chan.plugin) {
                     // build the user plugin config
                     response.channel.plugin = chan.plugin;

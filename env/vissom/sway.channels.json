@@ -2,6 +2,15 @@
     "Player1": {
         "displayName": "Layer 1 Opacity",
         "description": "This channel controls layer 1's opacity",
+        "state": {
+            "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0
+            },
+            "shape": 1
+        },
+
         "plugin": "realtime",
         "realtime": {
             "input": {
@@ -10,9 +19,6 @@
                 "id": 1,
                 "transform": "vissom",
                 "addressPrefix": "/p1"
-            },
-            "active": {
-                "address": "/active"
             },
             "orientation": {
                 "alpha": {
