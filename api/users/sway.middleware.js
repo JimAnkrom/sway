@@ -4,12 +4,10 @@
 
 module.exports = function (sway) {
 
-
-
     // Set all Access-Control headers for CORS OPTIONS preflight
     sway.express = {
         accessControlOptions: function (req, res, next) {
-
+            //console.log('CORS headers added - ' + req.headers.origin);
             res.header('Access-Control-Allow-Origin', req.headers.origin || "*");
             res.header('Access-Control-Allow-Credentials', true);
             res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -17,6 +15,7 @@ module.exports = function (sway) {
 
             // respond immediately to OPTIONS preflight request
             if ('OPTIONS' == req.method) {
+                //console.log('closing CORS');
                 res.status(200).end();
             } else {
                 next();

@@ -35,7 +35,7 @@
         "defaultQueueSize": 1
     },
     "user": {
-        "heartbeatInterval": 250,
+        "heartbeatInterval": 3000,
         "controlInterval": 50,
         "idleTimeout": 10000
     },

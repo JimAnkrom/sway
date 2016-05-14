@@ -5,7 +5,7 @@
         "state": {
             "color": {
                 "r": 255,
-                "g": 104,
+                "g": 0,
                 "b": 0
             },
             "shape": 1
@@ -24,8 +24,8 @@
                 "alpha": {
                     "address": "/posx",
                     "ratioPolar": {
-                        "floor": 170,
-                        "ceiling": 240
+                        "floor": 180,
+                        "ceiling": 270
                     }
                 },
                 "beta": {
@@ -58,8 +58,8 @@
         "state": {
             "color": {
                 "r": 255,
-                "g": 0,
-                "b": 255
+                "g": 255,
+                "b": 0
             },
             "shape": 2
         },
@@ -77,15 +77,15 @@
                 "alpha": {
                     "address": "/posx",
                     "ratioPolar": {
-                        "floor": 170,
-                        "ceiling": 240
+                        "floor": 180,
+                        "ceiling": 270
                     }
                 },
                 "beta": {
                     "address": "/posy",
                     "constraints": {
                         "floor": -10,
-                        "ceiling": 40
+                        "ceiling": 50
                     },
                     "scale": {
                         "min": 0,
@@ -111,8 +111,8 @@
         "state": {
             "color": {
                 "r": 255,
-                "g": 104,
-                "b": 255
+                "g": 153,
+                "b": 51
             },
             "shape": 3
         },
@@ -130,121 +130,15 @@
                 "alpha": {
                     "address": "/posx",
                     "ratioPolar": {
-                        "floor": 170,
-                        "ceiling": 240
+                        "floor": 180,
+                        "ceiling": 270
                     }
                 },
                 "beta": {
                     "address": "/posy",
                     "constraints": {
                         "floor": -10,
-                        "ceiling": 40
-                    },
-                    "scale": {
-                        "min": 0,
-                        "max": 1
-                    }
-                },
-                "gamma": {
-                    "constraints": {
-                        "floor": -90,
-                        "ceiling": 90
-                    },
-                    "scale": {
-                        "min": 0,
-                        "max": 1
-                    }
-                }
-            }
-        }
-    },
-    "Player4": {
-        "displayName": "Player 4",
-        "description": "This channel controls layer 1's opacity",
-        "state": {
-            "color": {
-                "r": 0,
-                "g": 255,
-                "b": 255
-            },
-            "shape": 4
-        },
-
-        "plugin": "realtime",
-        "realtime": {
-            "input": {
-            },
-            "output": {
-                "id": 1,
-                "transform": "vissom",
-                "addressPrefix": "/p4"
-            },
-            "orientation": {
-                "alpha": {
-                    "address": "/posx",
-                    "ratioPolar": {
-                        "floor": 170,
-                        "ceiling": 240
-                    }
-                },
-                "beta": {
-                    "address": "/posy",
-                    "constraints": {
-                        "floor": -10,
-                        "ceiling": 40
-                    },
-                    "scale": {
-                        "min": 0,
-                        "max": 1
-                    }
-                },
-                "gamma": {
-                    "constraints": {
-                        "floor": -90,
-                        "ceiling": 90
-                    },
-                    "scale": {
-                        "min": 0,
-                        "max": 1
-                    }
-                }
-            }
-        }
-    },
-    "Player5": {
-        "displayName": "Player 1",
-        "description": "This channel controls layer 1's opacity",
-        "state": {
-            "color": {
-                "r": 255,
-                "g": 0,
-                "b": 0
-            },
-            "shape": 5
-        },
-
-        "plugin": "realtime",
-        "realtime": {
-            "input": {
-            },
-            "output": {
-                "id": 1,
-                "transform": "vissom",
-                "addressPrefix": "/p5"
-            },
-            "orientation": {
-                "alpha": {
-                    "address": "/posx",
-                    "ratioPolar": {
-                        "floor": 170,
-                        "ceiling": 240
-                    }
-                },
-                "beta": {
-                    "address": "/posy",
-                    "constraints": {
-                        "floor": -10,
-                        "ceiling": 40
+                        "ceiling": 50
                     },
                     "scale": {
                         "min": 0,

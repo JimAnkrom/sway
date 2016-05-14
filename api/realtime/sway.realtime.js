@@ -8,6 +8,7 @@
  */
 
 var debug = true,
+    useEngineIO = false,
     utils = require('./../core/sway.utility.js'),
     engine = require('engine.io'),
     sway = require('./../core/sway.core.js'),
@@ -16,21 +17,35 @@ var debug = true,
 require('./sway.control.js')(sway);
 require('./sway.osc.js')(sway);
 
+var vissom = require('./vissom.realtime')(sway);
+
 sway.core.debug = debug;
 //    toolbox = require('../../../toolbox/dist/toolbox.node.js');
 sway.osc.open();
+
 console.log('Starting socket engine at port 3000');
-var server = engine.listen(3000);
+var server;
+
+if (useEngineIO) {
+    server = engine.listen(3000);
+    // Wire up connection event
+    server.on('connection', decorator.onConnect);
+}
+
 
 var decorator = {
     onMessage: new utils.Multicast(function (data) {
         if (!data) return;
+        // console.log('message received ' + data);
         var value1,
             values = data.split('|');
         var chan = values[0];
         // TODO: look up channel, plugins, etc.
         if (chan) {
             var channel = sway.core.channels[chan];
+            if (!channel) {
+                console.log('Channel not found: ' + chan);
+            }
             var plugin = channel[channel.plugin];
             // installation port & address need to be added
             Object.assign(plugin.output, sway.core.installation.output);
@@ -79,68 +94,6 @@ var decorator = {
     })
 };
 
-var vConfig = {
-    "active": {
-        "address": "/active"
-    },
-    "size": {
-        "address": "/size"
-    },
-    "color": {
-        "addressR": "/colr",
-        "addressG": "/colg",
-        "addressB": "/colb"
-    },
-    "shape": {
-        "address": "/shape"
-    }
-};
-
-// TODO: REFACTOR TO NEW LIBRARY -----------------------------
-var vissom = {
-    active: function (config, value) {
-        sway.osc.send(config.output, config.output.addressPrefix + vConfig.active.address, Number(value));
-    },
-    shape: function (config, value) {
-        sway.osc.send(config.output, config.output.addressPrefix + vConfig.shape.address, Number(value));
-    },
-    size: function (config, value) {
-        sway.osc.send(config.output, config.output.addressPrefix + vConfig.size.address, Number(value));
-    },
-    color: function (config, valueR, valueG, valueB) {
-        sway.osc.send(config.output, config.output.addressPrefix + vConfig.color.addressR, Number(valueR));
-        sway.osc.send(config.output, config.output.addressPrefix + vConfig.color.addressG, Number(valueG));
-        sway.osc.send(config.output, config.output.addressPrefix + vConfig.color.addressB, Number(valueB));
-    },
-    orientation: function (config, x, y, z) {
-        var output = config.output;
-        var oConfig = config.orientation;
-        // position /p#/posx , /p#/posy
-        //sway.osc.send(config, '/p' + config.id + '/posx', x);
-        //sway.osc.send(config, '/p' + config.id + '/posy', y);
-        //sway.osc.send(config, '/p3/posy', y);
-        //''
-        var value = Number(x);
-        if (!isNaN(value)) {
-            sway.osc.send(output, output.addressPrefix + oConfig.alpha.address, value);
-        }
-        value = Number(y);
-        if (!isNaN(value)) {
-            sway.osc.send(output, output.addressPrefix + oConfig.beta.address, value);
-        }
-    }
-};
-
-// TODO: not yet used
-//var outputPlugins = {
-//    "vissom": {
-//        "orientation": vissom.orientation
-//    }
-//};
-// TODO: END REFACTOR TO NEW LIBRARY --------------------------
-
-// Wire up connection event
-server.on('connection', decorator.onConnect);
 
 // Add the onMessage handler
 //    decorator.onMessage.add(function (data) {
@@ -162,7 +115,5 @@ server.on('connection', decorator.onConnect);
 //        vissom.orientation(plugin, values[1], values[2], values[3]);
 //        sway.log('Message received ' + values[1] + ' ' + values[2], 'realtime');
 //    });
-
-// TODO: add message to sway.plugins.output
 
 module.exports = decorator;

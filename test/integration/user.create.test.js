@@ -354,6 +354,7 @@ describe('Create User', function() {
             console.log(JSON.stringify(response));
             expect(response.queue).to.not.exist;
             expect(response.channel).to.not.exist;
+            expect(response.expired).to.equal(true);
 
             heartbeat(req5, res, next);
             expect(response.queue).to.not.exist;

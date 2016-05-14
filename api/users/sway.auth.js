@@ -23,13 +23,14 @@ module.exports = function (sway) {
         // Authenticate should validate and retrieve the user
         "authenticate": function (req, res, next) {
             // ensure user is valid
-            var auth = req.body.token || req.body.user;
-            var cookie = this.getCookie(req);
+            var auth = req.body.token || req.body.user || {};
+            var cookie = sway.auth.getCookie(req);
+            //console.log('cookie - ' + JSON.stringify(cookie));
             if (cookie && cookie.uid) {
                 if (auth.uid) {
                     if (auth.uid != cookie.uid) {
                         // TODO : When would this be true?
-                        this.setErrorMessage(res, 'UID match failure!');
+                        sway.auth.setErrorMessage(res, 'UID match failure!');
                     }
                 } else {
                     auth.uid = cookie.uid;
@@ -39,23 +40,27 @@ module.exports = function (sway) {
                 // TODO: When should this be true?
                 req.body.user.lastLogin = Date.now();
                 if (auth.uid != req.body.user.uid) {
-                    this.setErrorMessage(res, 'UID match failure!');
+                    sway.auth.setErrorMessage(res, 'UID match failure!');
                 }
             } else {
-                if (!auth) {
+                if (auth) {
                     //console.log()
-                }
-                // lookup the user and append to the request
-                if (!auth.uid) {
-                    this.setErrorMessage(res, 'Authentication Error: User UID Not Found!');
-                }
-                else {
-                    var user = sway.users.findByUid(auth.uid);
-                    if (user) {
-                        user.lastLogin = Date.now();
-                        req.user = user;
-                    } else {
-                        this.setErrorMessage(res, 'Authentication Error: User Not Found!');
+                    // lookup the user and append to the request
+                    if (!auth.uid) {
+                        sway.auth.setErrorMessage(res, 'Authentication Error: User UID Not Found!');
+                        req.runslashdie = true;
+                    }
+                    else {
+                        var user = sway.users.findByUid(auth.uid);
+                        if (user) {
+                            user.lastLogin = Date.now();
+                            req.user = user;
+                        } else {
+                            req.runslashdie = true;
+                            // sway.auth.setErrorMessage(res, 'Authentication Error: User Not Found! Creating new user!');
+                            //TODO: res.clearCookie(sway.users.cookie);
+                            // TODO: sway.auth.createUser(req, res, next);
+                        }
                     }
                 }
             }
@@ -70,8 +75,9 @@ module.exports = function (sway) {
         // Get auth status & channel, set into body
         "authUser": function (req, res, next) {
             var user = req.user;
+            //console.log('authUser');
             // Update the user channel info
-            sway.channels.update(user);
+            sway.channelControl.update(user);
             next();
         },
         // User Services
@@ -136,16 +142,16 @@ module.exports = function (sway) {
         },
         setErrorMessage: function (res, message) {
             sway.log('User Error Message: ' + message, 'sway.auth', 6);
-            res.json({message: message});
-            res.end();
+            //res.json({message: message});
+            //res.end();
         },
         setCookie: function (res, userCookie) {
-            res.cookie(sway.userCookie, userCookie);
+            res.cookie(sway.users.cookie, userCookie);
             //console.log('Cookie Set: ' + JSON.stringify(userCookie));
         },
         getCookie: function (req) {
             if (req.cookies) {
-                var cookie = req.cookies[sway.userCookie];
+                var cookie = req.cookies[sway.users.cookie];
                 //console.log('Cookie found! ' + JSON.stringify(cookie));
                 return cookie;
             }

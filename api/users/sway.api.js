@@ -55,7 +55,7 @@ module.exports = function (sway) {
 // Authorize these requests as a user
     userRouter.use(sway.auth.authUser);
 // check user pulse
-    userRouter.post(config.api.heartbeat, sway.server.heartbeat);
+    userRouter.get(config.api.heartbeat, sway.server.heartbeat);
 // remove users that have timed out
     userRouter.post(config.api.deleteUser, sway.server.expire);
 // submit control message
@@ -67,9 +67,10 @@ module.exports = function (sway) {
 // submit osc message
     userRouter.post(config.api.OSC, sway.server.sendOsc);
 //TODO: Find a good place for this (instrumentation)
-    userRouter.use(function () {
-        sway.monitor.currentFrame.setDuration();
-    });
+    //userRouter.use(function () {
+
+        //sway.monitor.currentFrame.setDuration();
+    //});
 // short-circuit response if there is no need to send updates back to the client
     userRouter.use(sway.server.shortResponse);
 // finalize user request
@@ -101,7 +102,7 @@ module.exports = function (sway) {
 
 //app.get(config.api.monitor, adminRouter);
 // Wire the user router to api calls
-    app.post(config.api.heartbeat, userRouter);
+    app.get(config.api.heartbeat, userRouter);
     app.post(config.api.deleteUser, userRouter);
     app.post(config.api.control, userRouter);
 

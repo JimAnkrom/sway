@@ -50,6 +50,13 @@ module.exports = function (sway) {
         },
         heartbeat: function (req, res, next) {
             // TODO: make this do... something?
+            if (req.user)
+            {
+                //console.log('heartbeat from user ' + req.user.id);
+            }
+            else {
+                console.log('heartbeat from unidentified source');
+            }
             // should renew a user's last used, or something, so we can scavenge for unused space in channels
             next();
         },
@@ -58,6 +65,7 @@ module.exports = function (sway) {
             console.log("Removing user " + req.user.uid + " from channel " + req.user.channel.name);
             // TODO: used to be 'sway.channels'
             sway.channelControl.remove(req.user.channel, req.user);
+            req.user.expired = true;
             req.message = sway.config.messages.expirationMessage;
             next();
         },
@@ -77,62 +85,82 @@ module.exports = function (sway) {
                 chan,
                 config;
 
-            //reset this now because we're sending the user out
-            user.changed = false;
-
-            // Add workflow state
-            if (user) response.state = user.state;
-
-            chan = user.channel || {};
-            if (chan.name) {
-                response.channel = {
-                    name: chan.name,
-                    display: chan.displayName,
-                    description: chan.description,
-                    userCount: chan.users.length,
-                    helpUrl: chan.helpUrl,
-                    url: chan.url,
-                    ip: chan.ip
-                };
-
-                if (chan.state) {
-                    response.channel.state = chan.state;
-                }
-
-                if (chan.plugin) {
-                    // build the user plugin config
-                    response.channel.plugin = chan.plugin;
-                    var channelPlugin = chan[chan.plugin];
-
-                    var insConf = sway.core.installation;
-
-                    // Merge installation info into input/output
-                    Object.assign(channelPlugin.input, insConf.input);
-                    Object.assign(channelPlugin.output, insConf.output);
-
-                    // TODO: Copy from an installation-level into orientation et al
-                    // TODO: Need a deep copy for that tho
-
-                    response.channel[chan.plugin] = channelPlugin;
-                }
-            } else {
-                if (user.queue) {
-                    response.queue = user.queue;
-                }
+            if (res.headersSent) {
+                console.log('headers sent');
             }
 
-            // add user messages
-            swayServer.addMessages(user.message, response);
+            if (req.runslashdie) {
+                console.log('Attempting to kill user');
+                response.runslashdie = true;
+            }
+            // Add workflow state
+            if (user) {
+                //reset this now because we're sending the user out
+                user.changed = false;
+
+                if (user.expired) {
+                    response.expired = true;
+                    if (sway.users && sway.users.cookie) {
+                        res.clearCookie(sway.users.cookie);
+                        console.log('cookie cleared');
+                    }
+                }
+
+                response.state = user.state;
+
+                chan = user.channel || {};
+                if (chan.name) {
+                    response.channel = {
+                        name: chan.name,
+                        display: chan.displayName,
+                        description: chan.description,
+                        userCount: chan.users.length,
+                        helpUrl: chan.helpUrl,
+                        url: chan.url,
+                        ip: chan.ip
+                    };
+
+                    if (chan.state) {
+                        response.channel.state = chan.state;
+                    }
+
+                    if (chan.plugin) {
+                        // build the user plugin config
+                        response.channel.plugin = chan.plugin;
+                        var channelPlugin = chan[chan.plugin];
+
+                        var insConf = sway.core.installation;
+
+                        // Merge installation info into input/output
+                        Object.assign(channelPlugin.input, insConf.input);
+                        Object.assign(channelPlugin.output, insConf.output);
+
+                        // TODO: Copy from an installation-level into orientation et al
+                        // TODO: Need a deep copy for that tho
+
+                        response.channel[chan.plugin] = channelPlugin;
+                    }
+                } else {
+                    if (user.queue) {
+                        response.queue = user.queue;
+                    }
+                }
+
+                // add user messages
+                swayServer.addMessages(user.message, response);
+            }
             // add system messages
             swayServer.addMessages(req.message, response);
 
             // in case we want to pass some config back to the user.
             // if it's attached to req.user.config, it means a system update
-            config = req.user.config;
-            if (config) {
-                req.user.config = null;
-            } else {
-                config = req.config;
+            if (req.user) {
+                config = req.user.config;
+                if (config) {
+                    req.user.config = null;
+                } else {
+                    config = req.config;
+                }
             }
             if (config) response.config = config;
 
@@ -144,6 +172,7 @@ module.exports = function (sway) {
 
             // return our response
             res.status(200).json(response);
+            res.end();
         },
         updateUserConfig: function (req, res, next) {
             req.config = {
@@ -166,13 +195,22 @@ module.exports = function (sway) {
         },
         // shortcircuit the response IF you don't have a message, config update, or redirect, otherwise next()
         shortResponse: function (req, res, next) {
+            if (res.headersSent) {
+                console.log('shortResponse: headers sent');
+            }
             if (
+                req.runslashdie ||
                 (req.user && req.user.changed)
                 || req.message
                 || req.config
                 || req.redirect
-                ) { next(); }
-            res.end();
+                ) {
+                next();
+                return;
+            } else {
+                //console.log('shorting response ' + req.path + ' ' + req.method);
+                res.end();
+            }
         },
         control: function (req, res, next) {
             if (debug) console.log('Server.control');

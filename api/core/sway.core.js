@@ -16,7 +16,7 @@ var sway = {
     // TODO: refactor log out to toolbox
     log: function (message, moduleName, severity, output) {
         var logConfig = sway.core.config.logging;
-        if (!severity) severity = 0;
+        if (!severity) severity = 100;
         output = output || logConfig.output;
         moduleName = moduleName || 'no module';
         if (console && sway.debug) {

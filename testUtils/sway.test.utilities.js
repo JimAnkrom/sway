@@ -4,7 +4,7 @@
 
 module.exports = {
     fakes: {
-        response: function (statusCallback, jsonCallback) {
+        response: function (statusCallback, jsonCallback, cookieCallback) {
             return {
                 status: function (code) {
                     statusCallback(code);
@@ -12,7 +12,12 @@ module.exports = {
                         json: jsonCallback
                     }
                 },
-                cookie: function (name, value) {}
+                cookie: function (name, value) {
+                    if (cookieCallback) cookieCallback(name, value);
+                },
+                clearCookie: function (name, options) {
+                    if (cookieCallback) cookieCallback(name + 'deleted', options);
+                }
             };
         },
         request: function (userId) {

@@ -181,16 +181,17 @@ module.exports = function (sway) {
         update: function (user) {
             // determine if they are in a channel or are requesting a channel
             if (user) {
-                if (user.channel) {
-                }
-                else {
-                    sway.channelControl.assign(user);
-                }
                 // TODO: determine if they are the active user in that channel or not (queued)
                 // TODO: if they are not active, determine wait time - this is in the overflow queue now
-                if (user.channel && !(user.active)) {
-
+                if (user.channel) {
+                    if (user.active) {
+                        return;
+                    }
+                    user.channel = null;
+                    user.changed = true;
                 }
+                if (user.queue) return;
+                sway.channelControl.assign(user);
             }
         },
         // get next channel from load balancer.
@@ -205,6 +206,7 @@ module.exports = function (sway) {
             } else {
                 console.log('sway.channels assign - loadBalancer returned a null channel');
             }
+
             this.overflowQueue.push(user);
             return;
         },
